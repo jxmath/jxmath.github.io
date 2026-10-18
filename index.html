@@ -96,11 +96,6 @@ header {
   border-radius: 999px;
   padding: 10px 18px;
   gap: 10px;
-  transition: transform 0.35s var(--ease), border-color 0.35s var(--ease), box-shadow 0.35s var(--ease);
-}
-
-.search-bar:focus-within {
-  transform: scale(1.02);
 }
 
 .search-bar svg {
@@ -133,6 +128,18 @@ header {
   letter-spacing: -0.02em;
   margin-bottom: 6px;
   color: #ffffff;
+}
+
+.site-title .ver-tag {
+  font-size: 0.42em;
+  font-weight: 800;
+  font-family: inherit;
+  vertical-align: super;
+  position: relative;
+  top: -0.15em;
+  margin-left: 3px;
+  color: #ffffff;
+  letter-spacing: -0.02em;
 }
 
 .site-tagline {
@@ -953,6 +960,11 @@ body.modal-open {
   color: #ffffff;
 }
 
+.play-shell .site-footer {
+  padding: 28px 16px 8px;
+  margin-top: 18px;
+}
+
 html {
   scrollbar-width: thin;
   scrollbar-color: var(--chip) transparent;
@@ -1138,7 +1150,7 @@ html {
           </svg>
         </button>
       </div>
-      <h1 class="site-title">jaxsons math!</h1>
+      <h1 class="site-title">jaxsons math!<sup class="ver-tag">v2</sup></h1>
       <p class="site-tagline"></p>
       <nav class="categories">
         <button type="button" class="cat-btn active" data-category="all">all</button>
@@ -1222,6 +1234,7 @@ html {
       <h2 class="recommended-title">recommended</h2>
       <div class="games-grid" id="recommended-grid"></div>
     </section>
+    <footer class="site-footer">all games playable on this website are complete copyright & property of their respective owners</footer>
   </div>
   </div>
 
@@ -2374,7 +2387,25 @@ function show(game) {
   const loader = document.getElementById("frame-loader");
 
   if (titleEl) titleEl.textContent = title;
-  if (catEl) catEl.textContent = game.category || "";
+  if (catEl) {
+    var cats = [];
+    if (Array.isArray(game.categories) && game.categories.length) {
+      cats = game.categories.slice();
+    } else if (game.category) {
+      cats = [game.category];
+    }
+    var seen = {};
+    var labels = [];
+    for (var ci = 0; ci < cats.length; ci++) {
+      var c = String(cats[ci] || "").trim();
+      if (!c) continue;
+      var k = c.toLowerCase();
+      if (seen[k]) continue;
+      seen[k] = 1;
+      labels.push(c);
+    }
+    catEl.textContent = labels.join(", ");
+  }
 
   if (frame) {
     const nf = document.getElementById("frame-notfound");
