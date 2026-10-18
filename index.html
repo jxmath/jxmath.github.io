@@ -207,20 +207,11 @@ header {
 }
 
 .section-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
   margin-bottom: 14px;
-  gap: 12px;
-}
-
-.section-head.has-sort {
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
 }
 
 .section-title {
+  margin: 0;
   font-size: 20px;
   font-weight: 800;
   letter-spacing: -0.01em;
@@ -231,29 +222,41 @@ header {
   display: none;
 }
 
-.sort-select {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background: var(--chip);
-  border: 1px solid var(--border);
-  color: var(--text);
-  border-radius: 999px;
-  padding: 9px 36px 9px 15px;
-  font-size: 14px;
-  font-weight: 700;
-  font-family: inherit;
+.section-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: left;
   cursor: pointer;
-  outline: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 13px center;
-  background-size: 13px 13px;
+}
+
+.section-pin {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
   flex-shrink: 0;
 }
 
-.sort-select:hover {
-  background-color: var(--chip-hover);
+.section-pin svg {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.15s ease;
+}
+
+.section-toggle[aria-expanded="false"] .section-pin svg {
+  transform: rotate(180deg);
+}
+
+.games-grid[hidden] {
+  display: none;
 }
 
 .games-grid {
@@ -1077,13 +1080,17 @@ html {
   background-clip: padding-box;
 }
 
-.games-loading {
+.app-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: var(--bg);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 14px;
-  padding: 64px 16px;
+  transition: opacity 0.35s var(--ease);
   color: rgba(255, 255, 255, 0.7);
   font-size: 14px;
   font-weight: 700;
@@ -1096,6 +1103,11 @@ html {
   border: 3px solid rgba(255, 255, 255, 0.15);
   border-top-color: var(--text);
   animation: spin 0.7s linear infinite;
+}
+
+.app-loader.done {
+  opacity: 0;
+  pointer-events: none;
 }
 
 @keyframes spin {
@@ -1492,6 +1504,11 @@ body::before {
 <body>
   <canvas id="particles"></canvas>
 
+  <div class="app-loader" id="app-loader" aria-label="loading">
+    <div class="loading-spinner"></div>
+    <span>loading boii...</span>
+  </div>
+
   <div id="view-home">
   <div class="container">
     <header>
@@ -1533,12 +1550,7 @@ body::before {
         <button type="button" class="cat-btn" data-category="strategy">strategy</button>
       </nav>
     </header>
-    <main id="rows">
-      <div class="games-loading" aria-label="loading">
-        <div class="loading-spinner"></div>
-        <span>loading games</span>
-      </div>
-    </main>
+    <main id="rows"></main>
     <footer class="site-footer">all games playable on this website are complete copyright & property of their respective owners</footer>
   </div>
   </div>
@@ -1704,7 +1716,8 @@ function jmFetchGames() {
   <script>
 const quotes = [
   "peak games boiiii",
-  "yooooooo"
+  "yooooooo",
+  "as a real street 🥷 myself"
 ];
 
 function pickQuote() {
@@ -1940,7 +1953,7 @@ if (document.readyState === "loading") {
           tabCloakPreset: cookie("tabCloakPreset"),
           favorites: localStorage.getItem("jm-favorites"),
           recent: localStorage.getItem("jm-recent"),
-          sort: localStorage.getItem("jm-sort"),
+          collapsed: localStorage.getItem("jm-collapsed"),
           lastCat: localStorage.getItem("jm-last-cat"),
           lastQuery: localStorage.getItem("jm-last-query"),
           theme: localStorage.getItem("jm-theme")
@@ -1973,7 +1986,7 @@ if (document.readyState === "loading") {
               if (d.theme && window.jmApplyTheme) window.jmApplyTheme(d.theme);
               if (d.favorites != null) localStorage.setItem("jm-favorites", typeof d.favorites === "string" ? d.favorites : JSON.stringify(d.favorites));
               if (d.recent != null) localStorage.setItem("jm-recent", typeof d.recent === "string" ? d.recent : JSON.stringify(d.recent));
-              if (d.sort) localStorage.setItem("jm-sort", d.sort);
+              if (d.collapsed != null) localStorage.setItem("jm-collapsed", typeof d.collapsed === "string" ? d.collapsed : JSON.stringify(d.collapsed));
               if (d.lastCat) localStorage.setItem("jm-last-cat", d.lastCat);
               if (d.lastQuery != null) localStorage.setItem("jm-last-query", d.lastQuery);
               toast("imported, reload recommended");
@@ -1993,7 +2006,7 @@ if (document.readyState === "loading") {
         localStorage.removeItem("panicUrl");
         localStorage.removeItem("jm-favorites");
         localStorage.removeItem("jm-recent");
-        localStorage.removeItem("jm-sort");
+        localStorage.removeItem("jm-collapsed");
         localStorage.removeItem("jm-last-cat");
         localStorage.removeItem("jm-last-query");
         if (window.jmApplyTheme) window.jmApplyTheme("default");
@@ -2024,10 +2037,26 @@ if (document.readyState === "loading") {
 let allGames = [];
 let currentCategory = "all";
 let currentQuery = "";
-let currentSort = "default";
 let favorites = [];
 let recentIds = [];
+let collapsedSections = [];
 let currentPlayGame = null;
+
+function loadCollapsed() {
+  try {
+    var raw = localStorage.getItem("jm-collapsed");
+    collapsedSections = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(collapsedSections)) collapsedSections = [];
+  } catch (e) {
+    collapsedSections = [];
+  }
+}
+
+function saveCollapsed() {
+  try {
+    localStorage.setItem("jm-collapsed", JSON.stringify(collapsedSections));
+  } catch (e) {}
+}
 
 function loadFavorites() {
   try {
@@ -2066,6 +2095,7 @@ function loadRecent() {
     const raw = localStorage.getItem("jm-recent");
     recentIds = raw ? JSON.parse(raw) : [];
     if (!Array.isArray(recentIds)) recentIds = [];
+    recentIds = recentIds.slice(0, 6);
   } catch (e) {
     recentIds = [];
   }
@@ -2073,7 +2103,7 @@ function loadRecent() {
 
 function saveRecent() {
   try {
-    localStorage.setItem("jm-recent", JSON.stringify(recentIds.slice(0, 12)));
+    localStorage.setItem("jm-recent", JSON.stringify(recentIds.slice(0, 6)));
   } catch (e) {}
 }
 
@@ -2081,7 +2111,7 @@ function pushRecent(id) {
   id = String(id);
   recentIds = recentIds.filter(function (x) { return x !== id; });
   recentIds.unshift(id);
-  if (recentIds.length > 12) recentIds = recentIds.slice(0, 12);
+  if (recentIds.length > 6) recentIds = recentIds.slice(0, 6);
   saveRecent();
 }
 
@@ -2095,7 +2125,7 @@ function getRecentGames() {
         break;
       }
     }
-    if (out.length >= 8) break;
+    if (out.length >= 6) break;
   }
   return out;
 }
@@ -2104,7 +2134,6 @@ function saveViewState() {
   try {
     localStorage.setItem("jm-last-cat", currentCategory);
     localStorage.setItem("jm-last-query", currentQuery);
-    localStorage.setItem("jm-sort", currentSort);
   } catch (e) {}
 }
 
@@ -2114,8 +2143,6 @@ function loadViewState() {
     if (c) currentCategory = c;
     var q = localStorage.getItem("jm-last-query");
     if (q != null) currentQuery = q;
-    var s = localStorage.getItem("jm-sort");
-    if (s === "default" || s === "newest" || s === "name") currentSort = s;
   } catch (e) {}
 }
 
@@ -2167,7 +2194,7 @@ function createCard(game, index) {
     e.stopPropagation();
     toggleFavorite(game.id);
     fav.classList.toggle("active", isFavorite(game.id));
-    if (currentCategory === "favorites" || currentSort === "favorites") {
+    if (currentCategory === "favorites") {
       render();
     }
   });
@@ -2270,66 +2297,41 @@ function gameIndex(game) {
   return 0;
 }
 
-function sortGames(games) {
-  var list = games.slice();
-  if (currentSort === "name") {
-    list.sort(function (a, b) {
-      var ta = String(a.title || a.id || "").toLowerCase();
-      var tb = String(b.title || b.id || "").toLowerCase();
-      if (ta < tb) return -1;
-      if (ta > tb) return 1;
-      return 0;
-    });
-    return list;
-  }
-  if (currentSort === "newest") {
-    list.sort(function (a, b) {
-      return gameIndex(b) - gameIndex(a);
-    });
-    return list;
-  }
-  return groupRelated(list);
-}
-
-function makeSortSelect() {
-  var sel = document.createElement("select");
-  sel.className = "sort-select";
-  sel.setAttribute("aria-label", "sort");
-  var opts = [
-    ["default", "default"],
-    ["newest", "newest"],
-    ["name", "by abc"]
-  ];
-  for (var i = 0; i < opts.length; i++) {
-    var o = document.createElement("option");
-    o.value = opts[i][0];
-    o.textContent = opts[i][1];
-    if (opts[i][0] === currentSort) o.selected = true;
-    sel.appendChild(o);
-  }
-  sel.addEventListener("change", function () {
-    currentSort = sel.value;
-    saveViewState();
-    render();
-  });
-  return sel;
-}
-
-function gridSection(title, games, withSort) {
+function gridSection(title, games) {
   const section = document.createElement("section");
   section.className = "section";
   const head = document.createElement("div");
   head.className = "section-head";
   const h2 = document.createElement("h2");
   h2.className = "section-title";
-  h2.textContent = title + " (" + games.length + ")";
+  const toggle = document.createElement("button");
+  toggle.type = "button";
+  toggle.className = "section-toggle";
+  const label = document.createElement("span");
+  label.textContent = title + " (" + games.length + ")";
+  const pin = document.createElement("span");
+  pin.className = "section-pin";
+  pin.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+  toggle.appendChild(label);
+  toggle.appendChild(pin);
+  h2.appendChild(toggle);
   head.appendChild(h2);
-  if (withSort) {
-    head.classList.add("has-sort");
-    head.appendChild(makeSortSelect());
-  }
   const grid = document.createElement("div");
   grid.className = "games-grid";
+  grid.hidden = collapsedSections.indexOf(title) !== -1;
+  toggle.setAttribute("aria-expanded", String(!grid.hidden));
+  toggle.setAttribute("aria-label", (grid.hidden ? "expand " : "collapse ") + title);
+  toggle.title = (grid.hidden ? "expand " : "collapse ") + title;
+  toggle.addEventListener("click", function () {
+    grid.hidden = !grid.hidden;
+    var i = collapsedSections.indexOf(title);
+    if (grid.hidden && i === -1) collapsedSections.push(title);
+    else if (!grid.hidden && i !== -1) collapsedSections.splice(i, 1);
+    saveCollapsed();
+    toggle.setAttribute("aria-expanded", String(!grid.hidden));
+    toggle.setAttribute("aria-label", (grid.hidden ? "expand " : "collapse ") + title);
+    toggle.title = (grid.hidden ? "expand " : "collapse ") + title;
+  });
   games.forEach(function (g, i) {
     grid.appendChild(createCard(g, i));
   });
@@ -2359,11 +2361,13 @@ function updateCategoryCounts() {
   }
 }
 
-function showLoading() {
-  const root = document.getElementById("rows");
-  if (!root) return;
-  root.innerHTML =
-    '<div class="games-loading" aria-label="loading"><div class="loading-spinner"></div><span>loading games</span></div>';
+function hideAppLoader() {
+  const loader = document.getElementById("app-loader");
+  if (!loader) return;
+  loader.classList.add("done");
+  setTimeout(function () {
+    loader.remove();
+  }, 400);
 }
 
 function setSearchPlaceholder() {
@@ -2382,10 +2386,10 @@ function render() {
   if (showRecent) {
     var recent = getRecentGames();
     if (recent.length) {
-      root.appendChild(gridSection("recently played", recent, false));
+      root.appendChild(gridSection("recently played", recent));
     }
   }
-  const filtered = sortGames(allGames.filter(matches));
+  const filtered = groupRelated(allGames.filter(matches));
   if (filtered.length === 0) {
     if (!showRecent || !getRecentGames().length) {
       const empty = document.createElement("div");
@@ -2407,7 +2411,7 @@ function render() {
       : currentCategory === "favorites"
         ? "favorites"
         : currentCategory;
-  root.appendChild(gridSection(title, filtered, true));
+  root.appendChild(gridSection(title, filtered));
 }
 
 function setCategory(cat, btn) {
@@ -2758,6 +2762,7 @@ window.jmGetCurrentPlay = function () { return currentPlayGame; };
 function init() {
   loadFavorites();
   loadRecent();
+  loadCollapsed();
   loadViewState();
   const nav = document.querySelector(".categories");
   if (nav) {
@@ -2784,7 +2789,6 @@ function init() {
     });
   }
   initParticles();
-  showLoading();
   jmFetchGames()
     .then(function (r) {
       if (!r.ok) throw new Error("games.json " + r.status);
@@ -2808,7 +2812,8 @@ function init() {
         root.innerHTML =
           '<div class="no-results">could not load games.json, use npm start (not file://)</div>';
       }
-    });
+    })
+    .finally(hideAppLoader);
 }
 
 if (document.readyState === "loading") {
