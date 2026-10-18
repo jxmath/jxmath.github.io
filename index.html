@@ -1274,18 +1274,41 @@ html {
   <div class="toast-wrap" id="toast-wrap"></div>
 
   <script>
-var JM_ASSETS = "https://cdn.jsdelivr.net/gh/jxmath/assets@e3ae10cc131e88677ce615c7eeec7ef9f22d2c8e";
+var JM_REPO = "jxmath/assets";
+var JM_ASSETS = "";
+var JM_ASSETS_READY = null;
+
+function jmResolveAssets() {
+  if (JM_ASSETS_READY) return JM_ASSETS_READY;
+  JM_ASSETS_READY = fetch("https://api.github.com/repos/" + JM_REPO + "/commits?per_page=1", {
+    headers: { Accept: "application/vnd.github+json" }
+  })
+    .then(function (r) {
+      if (!r.ok) throw new Error("github " + r.status);
+      return r.json();
+    })
+    .then(function (data) {
+      var sha = data && data[0] && data[0].sha;
+      if (!sha) throw new Error("no commit");
+      JM_ASSETS = "https://cdn.jsdelivr.net/gh/" + JM_REPO + "@" + sha;
+      return JM_ASSETS;
+    });
+  return JM_ASSETS_READY;
+}
+
 function jmFetchGames() {
-  return fetch(JM_ASSETS + "/games.json").then(function (r) {
-    if (!r.ok) return r;
-    return r.json().then(function (list) {
-      list = Array.isArray(list) ? list : [];
-      list.forEach(function (g) {
-        if (g && g.thumbnail && !/^(https?:)?\/\//.test(g.thumbnail)) {
-          g.thumbnail = JM_ASSETS + "/" + String(g.thumbnail).replace(/^\//, "");
-        }
+  return jmResolveAssets().then(function () {
+    return fetch(JM_ASSETS + "/games.json").then(function (r) {
+      if (!r.ok) return r;
+      return r.json().then(function (list) {
+        list = Array.isArray(list) ? list : [];
+        list.forEach(function (g) {
+          if (g && g.thumbnail && !/^(https?:)?\/\//.test(g.thumbnail)) {
+            g.thumbnail = JM_ASSETS + "/" + String(g.thumbnail).replace(/^\//, "");
+          }
+        });
+        return { ok: true, status: r.status, json: function () { return Promise.resolve(list); } };
       });
-      return { ok: true, status: r.status, json: function () { return Promise.resolve(list); } };
     });
   });
 }
