@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>jaxsons math</title>
+  <script>try{var t=localStorage.getItem("jm-theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
   <style>
 :root {
   --bg: #0b1020;
@@ -13,6 +14,11 @@
   --chip-hover: #2a3950;
   --accent: #4a6fa5;
   --accent-text: #ffffff;
+  --accent-hover: #5a82b8;
+  --surface: #1a2233;
+  --bar: rgba(15, 20, 32, 0.96);
+  --card-border: rgba(148, 163, 184, 0.28);
+  --card-border-hover: rgba(148, 163, 184, 0.55);
   --border: rgba(255, 255, 255, 0.1);
   --radius: 16px;
   --max-width: 1300px;
@@ -29,7 +35,7 @@
 html,
 body {
   background: var(--bg);
-  color: #ffffff;
+  color: var(--text);
 }
 
 body {
@@ -101,8 +107,8 @@ header {
 .search-bar svg {
   width: 18px;
   height: 18px;
-  color: #ffffff;
-  stroke: #ffffff;
+  color: var(--text);
+  stroke: var(--text);
   flex-shrink: 0;
 }
 
@@ -111,14 +117,14 @@ header {
   background: transparent;
   border: none;
   outline: none;
-  color: #ffffff;
+  color: var(--text);
   font-size: 15px;
   font-weight: 600;
-  caret-color: #ffffff;
+  caret-color: var(--text);
 }
 
 .search-bar input::placeholder {
-  color: #ffffff;
+  color: var(--text);
   opacity: 1;
 }
 
@@ -127,7 +133,7 @@ header {
   font-weight: 800;
   letter-spacing: -0.02em;
   margin-bottom: 6px;
-  color: #ffffff;
+  color: var(--text);
 }
 
 .site-title .ver-tag {
@@ -138,14 +144,14 @@ header {
   position: relative;
   top: -0.15em;
   margin-left: 3px;
-  color: #ffffff;
+  color: var(--text);
   letter-spacing: -0.02em;
 }
 
 .site-tagline {
   font-size: 15px;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--text);
   margin-bottom: 22px;
 }
 
@@ -163,7 +169,7 @@ header {
   z-index: 5;
   background: var(--chip);
   border: 1px solid transparent;
-  color: #ffffff;
+  color: var(--text);
   font-size: 14px;
   font-weight: 700;
   padding: 8px 16px;
@@ -175,7 +181,7 @@ header {
 
 .cat-btn:hover {
   background: var(--chip-hover);
-  color: #ffffff;
+  color: var(--text);
   transform: translateY(-1px);
 }
 
@@ -186,8 +192,8 @@ header {
 }
 
 .cat-btn.active:hover {
-  background: #5a82b8;
-  color: #ffffff;
+  background: var(--accent-hover);
+  color: var(--accent-text);
 }
 
 .section {
@@ -207,7 +213,7 @@ header {
   font-size: 20px;
   font-weight: 800;
   letter-spacing: -0.01em;
-  color: #ffffff;
+  color: var(--text);
 }
 
 .section-count {
@@ -228,11 +234,11 @@ header {
   max-height: 100px;
   margin: 8px;
   border-radius: 16px;
-  border: 3.2px solid rgba(148, 163, 184, 0.28);
+  border: 3.2px solid var(--card-border);
   overflow: hidden;
   cursor: pointer;
   text-decoration: none;
-  color: #ffffff;
+  color: var(--text);
   display: inline-block;
   background-color: var(--bg-card);
   background-repeat: no-repeat;
@@ -244,7 +250,7 @@ header {
 }
 
 .game-card:hover {
-  border-color: rgba(148, 163, 184, 0.55);
+  border-color: var(--card-border-hover);
   z-index: 1;
 }
 
@@ -288,8 +294,8 @@ header {
   justify-content: center;
   font-size: 28px;
   font-weight: 800;
-  color: #ffffff;
-  background: #1a2233;
+  color: var(--text);
+  background: var(--surface);
 }
 
 .game-fallback {
@@ -298,8 +304,8 @@ header {
   justify-content: center;
   font-size: 16px;
   font-weight: 800;
-  color: #ffffff;
-  background: #1a2233;
+  color: var(--text);
+  background: var(--surface);
 }
 
 .game-card:hover .game-thumb,
@@ -319,7 +325,7 @@ header {
   font-size: 30px;
   font-weight: 800;
   line-height: 1.1;
-  color: #ffffff;
+  color: var(--text);
   text-shadow:
     0 0 10px #000,
     0 0 20px #000,
@@ -336,7 +342,7 @@ header {
 
 .no-results {
   text-align: center;
-  color: #ffffff;
+  color: var(--text);
   padding: 40px 20px;
   font-size: 15px;
   animation: fade-up 0.4s var(--ease) both;
@@ -345,7 +351,7 @@ header {
 .play-body {
   min-height: 100vh;
   background: var(--bg);
-  color: #ffffff;
+  color: var(--text);
   position: relative;
 }
 
@@ -366,7 +372,7 @@ header {
 }
 
 .back-btn {
-  color: #ffffff;
+  color: var(--text);
   text-decoration: none;
   background: var(--chip);
   border: none;
@@ -421,7 +427,7 @@ header {
   justify-content: space-between;
   gap: 12px;
   padding: 8px 12px;
-  background: rgba(15, 20, 32, 0.96);
+  background: var(--bar);
   border-top: 1px solid var(--border);
 }
 
@@ -440,7 +446,7 @@ header {
 }
 
 .play-action {
-  color: #ffffff;
+  color: var(--text);
   background: var(--chip);
   border: none;
   border-radius: 999px;
@@ -475,7 +481,7 @@ header {
   padding: 0;
   border: none;
   background: transparent;
-  color: #fff;
+  color: var(--text);
   cursor: pointer;
   flex-shrink: 0;
 }
@@ -502,7 +508,7 @@ header {
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: #fff;
+  background: var(--text);
   border: none;
   cursor: pointer;
   box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.25);
@@ -512,7 +518,7 @@ header {
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: #fff;
+  background: var(--text);
   border: none;
   cursor: pointer;
   box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.25);
@@ -542,7 +548,7 @@ header {
   font-size: 14px;
   font-weight: 800;
   letter-spacing: -0.01em;
-  color: #ffffff;
+  color: var(--text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -551,7 +557,7 @@ header {
 .play-cat {
   font-size: 12px;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--text);
   opacity: 0.9;
 }
 
@@ -564,7 +570,7 @@ header {
   font-size: 18px;
   font-weight: 800;
   letter-spacing: -0.01em;
-  color: #ffffff;
+  color: var(--text);
   margin-bottom: 12px;
 }
 
@@ -692,7 +698,7 @@ header {
   flex-shrink: 0;
   background: var(--chip);
   border: 1px solid var(--border);
-  color: #fff;
+  color: var(--text);
   width: 42px;
   height: 42px;
   border-radius: 50%;
@@ -791,13 +797,13 @@ header {
 .modal-head h2 {
   font-size: 18px;
   font-weight: 800;
-  color: #fff;
+  color: var(--text);
 }
 
 .modal-close {
   background: transparent;
   border: none;
-  color: #fff;
+  color: var(--text);
   font-size: 28px;
   line-height: 1;
   cursor: pointer;
@@ -834,7 +840,7 @@ header {
   width: 100%;
   background: var(--chip);
   border: 1px solid var(--border);
-  color: #fff;
+  color: var(--text);
   border-radius: 10px;
   padding: 10px 12px;
   font-size: 14px;
@@ -870,7 +876,7 @@ header {
 .settings-action {
   background: var(--accent);
   border: none;
-  color: #fff;
+  color: var(--accent-text);
   font-size: 13px;
   font-weight: 700;
   padding: 8px 14px;
@@ -880,7 +886,7 @@ header {
 }
 
 .settings-action:hover {
-  background: #5a82b8;
+  background: var(--accent-hover);
 }
 
 body.modal-open {
@@ -903,7 +909,7 @@ body.modal-open {
 .toast {
   background: var(--chip);
   border: 1px solid var(--border);
-  color: #fff;
+  color: var(--text);
   padding: 8px 14px;
   border-radius: 999px;
   font-size: 13px;
@@ -957,7 +963,7 @@ body.modal-open {
   margin-top: auto;
   font-size: 13px;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--text);
 }
 
 .play-shell .site-footer {
@@ -1009,7 +1015,7 @@ html {
   height: 28px;
   border-radius: 50%;
   border: 3px solid rgba(255, 255, 255, 0.15);
-  border-top-color: #fff;
+  border-top-color: var(--text);
   animation: spin 0.7s linear infinite;
 }
 
@@ -1028,7 +1034,7 @@ html {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: #fff;
+  background: var(--text);
   animation: circlePulse 1s ease-in-out infinite;
 }
 
@@ -1044,7 +1050,7 @@ html {
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: #0b1020;
+  background: var(--bg);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1075,7 +1081,7 @@ html {
   position: absolute;
   inset: 0;
   z-index: 5;
-  background: #0b1020;
+  background: var(--bg);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1101,7 +1107,7 @@ html {
   position: absolute;
   inset: 0;
   z-index: 6;
-  background: #0b1020;
+  background: var(--bg);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1117,7 +1123,7 @@ html {
   font-size: 56px;
   font-weight: 800;
   letter-spacing: -0.03em;
-  color: #fff;
+  color: var(--text);
   line-height: 1;
 }
 
@@ -1126,6 +1132,148 @@ html {
   font-weight: 700;
   color: rgba(255, 255, 255, 0.55);
 }
+  
+/* ---- theme palettes ---- */
+:root[data-theme="moonlight"] {
+  --bg: #1e2030;
+  --bg-card: #222436;
+  --chip: #2f334d;
+  --chip-hover: #3b4261;
+  --text: #c8d3f5;
+  --accent: #82aaff;
+  --accent-text: #1e2030;
+  --accent-hover: #9ab9ff;
+  --border: rgba(200, 211, 245, 0.12);
+  --surface: #2f334d;
+  --bar: rgba(25, 27, 41, 0.96);
+  --card-border: rgba(130, 139, 184, 0.32);
+  --card-border-hover: rgba(130, 139, 184, 0.65);
+}
+:root[data-theme="purple"] {
+  --bg: #130a24;
+  --bg-card: #1d1236;
+  --chip: #2b1c4d;
+  --chip-hover: #3b2766;
+  --text: #f5f3ff;
+  --accent: #6d28d9;
+  --accent-text: #ffffff;
+  --accent-hover: #7c3aed;
+  --border: rgba(196, 181, 253, 0.12);
+  --surface: #231642;
+  --bar: rgba(15, 8, 29, 0.96);
+  --card-border: rgba(167, 139, 250, 0.32);
+  --card-border-hover: rgba(167, 139, 250, 0.65);
+}
+:root[data-theme="nord"] {
+  --bg: #2e3440;
+  --bg-card: #3b4252;
+  --chip: #434c5e;
+  --chip-hover: #4c566a;
+  --text: #eceff4;
+  --accent: #88c0d0;
+  --accent-text: #2e3440;
+  --accent-hover: #9ccfdc;
+  --border: rgba(216, 222, 233, 0.12);
+  --surface: #3b4252;
+  --bar: rgba(36, 41, 51, 0.96);
+  --card-border: rgba(129, 161, 193, 0.32);
+  --card-border-hover: rgba(129, 161, 193, 0.65);
+}
+:root[data-theme="rose pine"] {
+  --bg: #191724;
+  --bg-card: #1f1d2e;
+  --chip: #26233a;
+  --chip-hover: #393552;
+  --text: #e0def4;
+  --accent: #ebbcba;
+  --accent-text: #191724;
+  --accent-hover: #f1d0ce;
+  --border: rgba(224, 222, 244, 0.12);
+  --surface: #26233a;
+  --bar: rgba(20, 18, 29, 0.96);
+  --card-border: rgba(110, 106, 134, 0.32);
+  --card-border-hover: rgba(110, 106, 134, 0.65);
+}
+:root[data-theme="gruvbox"] {
+  --bg: #1d2021;
+  --bg-card: #282828;
+  --chip: #3c3836;
+  --chip-hover: #504945;
+  --text: #ebdbb2;
+  --accent: #fabd2f;
+  --accent-text: #1d2021;
+  --accent-hover: #fcd05c;
+  --border: rgba(235, 219, 178, 0.12);
+  --surface: #32302f;
+  --bar: rgba(22, 24, 25, 0.96);
+  --card-border: rgba(168, 153, 132, 0.32);
+  --card-border-hover: rgba(168, 153, 132, 0.65);
+}
+:root[data-theme="forest"] {
+  --bg: #232a2e;
+  --bg-card: #2d353b;
+  --chip: #343f44;
+  --chip-hover: #3d484d;
+  --text: #d3c6aa;
+  --accent: #a7c080;
+  --accent-text: #232a2e;
+  --accent-hover: #b9d093;
+  --border: rgba(211, 198, 170, 0.12);
+  --surface: #343f44;
+  --bar: rgba(30, 35, 38, 0.96);
+  --card-border: rgba(133, 146, 137, 0.32);
+  --card-border-hover: rgba(133, 146, 137, 0.65);
+}
+
+/* ---- themes ---- */
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(128px, 1fr));
+  gap: 8px;
+}
+
+.theme-opt {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 10px;
+  background: var(--chip);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.theme-opt:hover {
+  background: var(--chip-hover);
+}
+
+.theme-opt.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.theme-opt .sw {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.theme-opt .sw i {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  margin-right: -5px;
+  border: 1.5px solid var(--chip);
+}
+
+.theme-opt .sw i:nth-child(1) { background: var(--s1); }
+.theme-opt .sw i:nth-child(2) { background: var(--s2); }
+.theme-opt .sw i:nth-child(3) { background: var(--s3); margin-right: 0; }
   </style>
 </head>
 <body>
@@ -1246,6 +1394,19 @@ html {
         <button type="button" class="modal-close" id="settings-close" aria-label="close">×</button>
       </div>
       <div class="modal-body">
+        <section class="settings-section">
+          <h3>theme</h3>
+          <div class="theme-grid" id="themeGrid">
+          <button type="button" class="theme-opt" data-theme="default" style="--s1:#0b1020;--s2:#151d2e;--s3:#4a6fa5"><span class="sw"><i></i><i></i><i></i></span>default</button>
+          <button type="button" class="theme-opt" data-theme="moonlight" style="--s1:#1e2030;--s2:#222436;--s3:#82aaff"><span class="sw"><i></i><i></i><i></i></span>moonlight</button>
+          <button type="button" class="theme-opt" data-theme="purple" style="--s1:#130a24;--s2:#1d1236;--s3:#6d28d9"><span class="sw"><i></i><i></i><i></i></span>purple</button>
+          <button type="button" class="theme-opt" data-theme="nord" style="--s1:#2e3440;--s2:#3b4252;--s3:#88c0d0"><span class="sw"><i></i><i></i><i></i></span>nord</button>
+          <button type="button" class="theme-opt" data-theme="rose pine" style="--s1:#191724;--s2:#1f1d2e;--s3:#ebbcba"><span class="sw"><i></i><i></i><i></i></span>rose pine</button>
+          <button type="button" class="theme-opt" data-theme="gruvbox" style="--s1:#1d2021;--s2:#282828;--s3:#fabd2f"><span class="sw"><i></i><i></i><i></i></span>gruvbox</button>
+          <button type="button" class="theme-opt" data-theme="forest" style="--s1:#232a2e;--s2:#2d353b;--s3:#a7c080"><span class="sw"><i></i><i></i><i></i></span>forest</button>
+          </div>
+        </section>
+
         <section class="settings-section">
           <h3>tab cloaking</h3>
           <select id="presetSelect">
@@ -1563,7 +1724,8 @@ if (document.readyState === "loading") {
           panicKey: localStorage.getItem("panicKey"),
           panicUrl: localStorage.getItem("panicUrl"),
           tabCloakPreset: cookie("tabCloakPreset"),
-          favorites: localStorage.getItem("jm-favorites")
+          favorites: localStorage.getItem("jm-favorites"),
+          theme: localStorage.getItem("jm-theme")
         };
         const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
         const a = document.createElement("a");
@@ -1590,6 +1752,7 @@ if (document.readyState === "loading") {
               if (d.panicKey) localStorage.setItem("panicKey", d.panicKey);
               if (d.panicUrl) localStorage.setItem("panicUrl", d.panicUrl);
               if (d.tabCloakPreset) cookie("tabCloakPreset", d.tabCloakPreset, 365);
+              if (d.theme && window.jmApplyTheme) window.jmApplyTheme(d.theme);
               if (d.favorites != null) localStorage.setItem("jm-favorites", typeof d.favorites === "string" ? d.favorites : JSON.stringify(d.favorites));
               toast("imported, reload recommended");
             } catch (e) {
@@ -1607,6 +1770,7 @@ if (document.readyState === "loading") {
         localStorage.removeItem("panicKey");
         localStorage.removeItem("panicUrl");
         localStorage.removeItem("jm-favorites");
+        if (window.jmApplyTheme) window.jmApplyTheme("default");
         cookie("tabCloakPreset", "", -1);
         toast("cleared");
       });
@@ -2512,6 +2676,36 @@ window.jmPlay = { init: init, enter: enter, leave: leave };
     var btn = document.getElementById("settings-btn");
     if (btn) btn.click();
   });
+})();
+  </script>
+  <script>
+(function () {
+  var NAMES = ["default", "moonlight", "purple", "nord", "rose pine", "gruvbox", "forest"];
+  function apply(name) {
+    if (NAMES.indexOf(name) === -1) name = "default";
+    var root = document.documentElement;
+    if (name === "default") root.removeAttribute("data-theme");
+    else root.setAttribute("data-theme", name);
+    try {
+      if (name === "default") localStorage.removeItem("jm-theme");
+      else localStorage.setItem("jm-theme", name);
+    } catch (e) {}
+    var opts = document.querySelectorAll(".theme-opt");
+    for (var i = 0; i < opts.length; i++) {
+      opts[i].classList.toggle("active", opts[i].getAttribute("data-theme") === name);
+    }
+  }
+  window.jmApplyTheme = apply;
+  var grid = document.getElementById("themeGrid");
+  if (grid) {
+    grid.addEventListener("click", function (e) {
+      var b = e.target.closest(".theme-opt");
+      if (b) apply(b.getAttribute("data-theme"));
+    });
+  }
+  var cur = "default";
+  try { cur = localStorage.getItem("jm-theme") || "default"; } catch (e) {}
+  apply(cur);
 })();
   </script>
 </body>
