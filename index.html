@@ -94,23 +94,10 @@ header {
   margin-bottom: 36px;
 }
 
-#oneko {
-  width: 50px;
-  height: 50px;
-  flex: 0 0 50px;
-  image-rendering: pixelated;
-  cursor: pointer;
-  background-image: url("https://cdn.jsdelivr.net/gh/adryd325/oneko.js@master/oneko.gif");
-  background-repeat: no-repeat;
-  background-size: 400px 200px;
-  background-position: -100px 0;
-  display: block;
-}
-
 .search-bar {
-  width: 400px;
-  max-width: 480px;
-  min-width: 320px;
+  width: 560px;
+  max-width: 640px;
+  min-width: 400px;
   height: 50px;
   display: flex;
   align-items: center;
@@ -227,6 +214,12 @@ header {
   gap: 12px;
 }
 
+.section-head.has-sort {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
 .section-title {
   font-size: 20px;
   font-weight: 800;
@@ -236,6 +229,31 @@ header {
 
 .section-count {
   display: none;
+}
+
+.sort-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: var(--chip);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 9px 36px 9px 15px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  outline: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 13px center;
+  background-size: 13px 13px;
+  flex-shrink: 0;
+}
+
+.sort-select:hover {
+  background-color: var(--chip-hover);
 }
 
 .games-grid {
@@ -839,6 +857,47 @@ header {
   padding: 18px 22px 26px;
 }
 
+.switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.toggle {
+  position: relative;
+  width: 44px;
+  height: 26px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 999px;
+  background: var(--chip);
+  cursor: pointer;
+  padding: 0;
+}
+
+.toggle[aria-checked="true"] {
+  background: var(--accent);
+}
+
+.toggle i {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.2s var(--ease);
+  pointer-events: none;
+}
+
+.toggle[aria-checked="true"] i {
+  transform: translateX(18px);
+}
+
 .settings-section {
   margin-bottom: 22px;
 }
@@ -1422,10 +1481,11 @@ body::before {
 
 .tn {
   line-height: 1;
+  color: #fff;
 }
 
 .theme-opt.active .tn {
-  color: var(--accent);
+  color: #fff;
 }
   </style>
 </head>
@@ -1437,7 +1497,6 @@ body::before {
     <header>
       <div class="top-bar">
         <div class="search-wrap">
-          <div id="oneko" aria-hidden="true"></div>
           <div class="search-bar">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -1553,11 +1612,11 @@ body::before {
           <div class="theme-grid" id="themeGrid" role="radiogroup" aria-label="theme">
           <button type="button" class="theme-opt" role="radio" aria-checked="false" data-theme="default" style="--p-bg:#0b1020;--p-card:#151d2e;--p-chip:#1e293b;--p-accent:#4a6fa5;--p-edge:rgba(255, 255, 255,0.16);--p-title:#ffffff;--p-fx:none"><span class="tp"><span class="tp-fx"><i style="left:33%;top:19%;width:1.9px;height:1.9px;background:#ffffff;opacity:.55"></i><i style="left:11%;top:52%;width:1.6px;height:1.6px;background:#ffffff;opacity:.55"></i><i style="left:9%;top:50%;width:1.2px;height:1.2px;background:#ffffff;opacity:.55"></i><i style="left:43%;top:12%;width:1.3px;height:1.3px;background:#ffffff;opacity:.55"></i><i style="left:42%;top:77%;width:1.3px;height:1.3px;background:#ffffff;opacity:.55"></i><i style="left:24%;top:60%;width:2.1px;height:2.1px;background:#ffffff;opacity:.55"></i><i style="left:56%;top:40%;width:2.2px;height:2.2px;background:#ffffff;opacity:.55"></i><i style="left:8%;top:80%;width:1.5px;height:1.5px;background:#ffffff;opacity:.55"></i><i style="left:17%;top:16%;width:1.5px;height:1.5px;background:#ffffff;opacity:.55"></i><i style="left:77%;top:22%;width:1.8px;height:1.8px;background:#ffffff;opacity:.55"></i></span><span class="tp-title"></span><span class="tp-chips"><i></i><i></i><i></i></span><span class="tp-cards"><i></i><i></i><i></i></span><span class="tp-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></span><span class="tn">default</span></button>
           <button type="button" class="theme-opt" role="radio" aria-checked="false" data-theme="moonlight" style="--p-bg:#171a30;--p-card:#1e2240;--p-chip:#2a2f55;--p-accent:#aab8ff;--p-edge:rgba(205, 214, 255,0.16);--p-title:#d6defc;--p-fx:radial-gradient(circle at 91% 10%, #f4f6ff 0 15px, rgba(214,222,255,0.5) 16px, rgba(150,165,255,0.16) 64px, transparent 150px), radial-gradient(ellipse 70% 45% at 85% 0%, rgba(140,155,255,0.16), transparent 70%), radial-gradient(ellipse 80% 50% at 0% 100%, rgba(80,95,200,0.18), transparent 70%)"><span class="tp"><span class="tp-fx"><i style="left:62%;top:38%;width:1.5px;height:1.5px;background:#ffffff;opacity:0.78"></i><i style="left:60%;top:49%;width:2.5px;height:2.5px;background:#ffffff;opacity:0.89"></i><i style="left:46%;top:85%;width:2.0px;height:2.0px;background:#ffffff;opacity:0.65"></i><i style="left:75%;top:66%;width:1.5px;height:1.5px;background:#ffffff;opacity:0.54"></i><i style="left:31%;top:49%;width:2.0px;height:2.0px;background:#ffffff;opacity:0.86"></i><i style="left:30%;top:90%;width:1.5px;height:1.5px;background:#ffffff;opacity:0.76"></i><i style="left:19%;top:35%;width:2.5px;height:2.5px;background:#ffffff;opacity:0.71"></i><i style="left:91%;top:13%;width:2.0px;height:2.0px;background:#ffffff;opacity:0.67"></i><i style="left:36%;top:49%;width:2.5px;height:2.5px;background:#ffffff;opacity:0.53"></i><i style="left:12%;top:29%;width:1.5px;height:1.5px;background:#ffffff;opacity:0.53"></i><i style="left:67%;top:62%;width:2.5px;height:2.5px;background:#ffffff;opacity:0.64"></i><i style="left:39%;top:64%;width:1.5px;height:1.5px;background:#ffffff;opacity:0.97"></i><i style="left:36%;top:59%;width:2.5px;height:2.5px;background:#ffffff;opacity:0.53"></i><i style="left:73%;top:17%;width:1.5px;height:1.5px;background:#ffffff;opacity:0.70"></i></span><span class="tp-title"></span><span class="tp-chips"><i></i><i></i><i></i></span><span class="tp-cards"><i></i><i></i><i></i></span><span class="tp-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></span><span class="tn">moonlight</span></button>
-          <button type="button" class="theme-opt" role="radio" aria-checked="false" data-theme="purple" style="--p-bg:#241833;--p-card:#2e2142;--p-chip:#3d2c56;--p-accent:#c4a6f5;--p-edge:rgba(196,166,245,0.28);--p-title:#f6f0ff;--p-fx:none"><span class="tp"><span class="tp-fx"></span><span class="tp-title"></span><span class="tp-chips"><i></i><i></i><i></i></span><span class="tp-cards"><i></i><i></i><i></i></span><span class="tp-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></span><span class="tn">purple</span></button>
-          <button type="button" class="theme-opt" role="radio" aria-checked="false" data-theme="ocean" style="--p-bg:#102833;--p-card:#173440;--p-chip:#214555;--p-accent:#8fd4e4;--p-edge:rgba(143,212,228,0.28);--p-title:#eef8fb;--p-fx:none"><span class="tp"><span class="tp-fx"></span><span class="tp-title"></span><span class="tp-chips"><i></i><i></i><i></i></span><span class="tp-cards"><i></i><i></i><i></i></span><span class="tp-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></span><span class="tn">ocean</span></button>
-          <button type="button" class="theme-opt" role="radio" aria-checked="false" data-theme="forest" style="--p-bg:#17261c;--p-card:#1f3226;--p-chip:#2a4334;--p-accent:#a8d492;--p-edge:rgba(168,212,146,0.28);--p-title:#f0f7ec;--p-fx:none"><span class="tp"><span class="tp-fx"></span><span class="tp-title"></span><span class="tp-chips"><i></i><i></i><i></i></span><span class="tp-cards"><i></i><i></i><i></i></span><span class="tp-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></span><span class="tn">forest</span></button>
-          <button type="button" class="theme-opt" role="radio" aria-checked="false" data-theme="ember" style="--p-bg:#2a1c18;--p-card:#362420;--p-chip:#4a322b;--p-accent:#f0b08a;--p-edge:rgba(240,176,138,0.28);--p-title:#fff6f1;--p-fx:none"><span class="tp"><span class="tp-fx"></span><span class="tp-title"></span><span class="tp-chips"><i></i><i></i><i></i></span><span class="tp-cards"><i></i><i></i><i></i></span><span class="tp-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></span><span class="tn">ember</span></button>
-          <button type="button" class="theme-opt" role="radio" aria-checked="false" data-theme="gruvbox" style="--p-bg:#32302f;--p-card:#3c3836;--p-chip:#504945;--p-accent:#fabd2f;--p-edge:rgba(213,196,161,0.28);--p-title:#fbf1c7;--p-fx:none"><span class="tp"><span class="tp-fx"></span><span class="tp-title"></span><span class="tp-chips"><i></i><i></i><i></i></span><span class="tp-cards"><i></i><i></i><i></i></span><span class="tp-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></span><span class="tn">gruvbox</span></button>
+          <button type="button" class="theme-opt" role="radio" aria-checked="false" data-theme="purple" style="--p-bg:#241833;--p-card:#2e2142;--p-chip:#3d2c56;--p-accent:#c4a6f5;--p-edge:rgba(196,166,245,0.28);--p-title:#f6f0ff;--p-fx:radial-gradient(ellipse 80% 50% at 50% 0%, rgba(180, 150, 230, 0.55), transparent 70%)"><span class="tp"><span class="tp-fx"><i style="left:18%;top:22%;width:1.6px;height:1.6px;background:#fff;opacity:.55"></i><i style="left:42%;top:14%;width:2px;height:2px;background:#fff;opacity:.4"></i><i style="left:70%;top:28%;width:1.4px;height:1.4px;background:#fff;opacity:.6"></i><i style="left:28%;top:48%;width:1.8px;height:1.8px;background:#fff;opacity:.35"></i><i style="left:84%;top:46%;width:1.5px;height:1.5px;background:#fff;opacity:.5"></i><i style="left:55%;top:62%;width:2.1px;height:2.1px;background:#fff;opacity:.45"></i><i style="left:12%;top:70%;width:1.3px;height:1.3px;background:#fff;opacity:.5"></i><i style="left:36%;top:78%;width:1.7px;height:1.7px;background:#fff;opacity:.35"></i></span><span class="tp-title"></span><span class="tp-chips"><i></i><i></i><i></i></span><span class="tp-cards"><i></i><i></i><i></i></span><span class="tp-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></span><span class="tn">purple</span></button>
+          <button type="button" class="theme-opt" role="radio" aria-checked="false" data-theme="ocean" style="--p-bg:#102833;--p-card:#173440;--p-chip:#214555;--p-accent:#8fd4e4;--p-edge:rgba(143,212,228,0.28);--p-title:#eef8fb;--p-fx:radial-gradient(ellipse 80% 46% at 50% 0%, rgba(143, 212, 228, 0.55), transparent 70%)"><span class="tp"><span class="tp-fx"><i style="left:18%;top:22%;width:1.6px;height:1.6px;background:#fff;opacity:.55"></i><i style="left:42%;top:14%;width:2px;height:2px;background:#fff;opacity:.4"></i><i style="left:70%;top:28%;width:1.4px;height:1.4px;background:#fff;opacity:.6"></i><i style="left:28%;top:48%;width:1.8px;height:1.8px;background:#fff;opacity:.35"></i><i style="left:84%;top:46%;width:1.5px;height:1.5px;background:#fff;opacity:.5"></i><i style="left:55%;top:62%;width:2.1px;height:2.1px;background:#fff;opacity:.45"></i><i style="left:12%;top:70%;width:1.3px;height:1.3px;background:#fff;opacity:.5"></i><i style="left:36%;top:78%;width:1.7px;height:1.7px;background:#fff;opacity:.35"></i></span><span class="tp-title"></span><span class="tp-chips"><i></i><i></i><i></i></span><span class="tp-cards"><i></i><i></i><i></i></span><span class="tp-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></span><span class="tn">ocean</span></button>
+          <button type="button" class="theme-opt" role="radio" aria-checked="false" data-theme="forest" style="--p-bg:#17261c;--p-card:#1f3226;--p-chip:#2a4334;--p-accent:#a8d492;--p-edge:rgba(168,212,146,0.28);--p-title:#f0f7ec;--p-fx:radial-gradient(ellipse 80% 46% at 50% 0%, rgba(168, 212, 146, 0.5), transparent 70%)"><span class="tp"><span class="tp-fx"><i style="left:18%;top:22%;width:1.6px;height:1.6px;background:#fff;opacity:.55"></i><i style="left:42%;top:14%;width:2px;height:2px;background:#fff;opacity:.4"></i><i style="left:70%;top:28%;width:1.4px;height:1.4px;background:#fff;opacity:.6"></i><i style="left:28%;top:48%;width:1.8px;height:1.8px;background:#fff;opacity:.35"></i><i style="left:84%;top:46%;width:1.5px;height:1.5px;background:#fff;opacity:.5"></i><i style="left:55%;top:62%;width:2.1px;height:2.1px;background:#fff;opacity:.45"></i><i style="left:12%;top:70%;width:1.3px;height:1.3px;background:#fff;opacity:.5"></i><i style="left:36%;top:78%;width:1.7px;height:1.7px;background:#fff;opacity:.35"></i></span><span class="tp-title"></span><span class="tp-chips"><i></i><i></i><i></i></span><span class="tp-cards"><i></i><i></i><i></i></span><span class="tp-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></span><span class="tn">forest</span></button>
+          <button type="button" class="theme-opt" role="radio" aria-checked="false" data-theme="ember" style="--p-bg:#2a1c18;--p-card:#362420;--p-chip:#4a322b;--p-accent:#f0b08a;--p-edge:rgba(240,176,138,0.28);--p-title:#fff6f1;--p-fx:radial-gradient(ellipse 80% 46% at 50% 100%, rgba(240, 176, 138, 0.55), transparent 70%)"><span class="tp"><span class="tp-fx"><i style="left:18%;top:22%;width:1.6px;height:1.6px;background:#fff;opacity:.55"></i><i style="left:42%;top:14%;width:2px;height:2px;background:#fff;opacity:.4"></i><i style="left:70%;top:28%;width:1.4px;height:1.4px;background:#fff;opacity:.6"></i><i style="left:28%;top:48%;width:1.8px;height:1.8px;background:#fff;opacity:.35"></i><i style="left:84%;top:46%;width:1.5px;height:1.5px;background:#fff;opacity:.5"></i><i style="left:55%;top:62%;width:2.1px;height:2.1px;background:#fff;opacity:.45"></i><i style="left:12%;top:70%;width:1.3px;height:1.3px;background:#fff;opacity:.5"></i><i style="left:36%;top:78%;width:1.7px;height:1.7px;background:#fff;opacity:.35"></i></span><span class="tp-title"></span><span class="tp-chips"><i></i><i></i><i></i></span><span class="tp-cards"><i></i><i></i><i></i></span><span class="tp-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></span><span class="tn">ember</span></button>
+          <button type="button" class="theme-opt" role="radio" aria-checked="false" data-theme="gruvbox" style="--p-bg:#32302f;--p-card:#3c3836;--p-chip:#504945;--p-accent:#fabd2f;--p-edge:rgba(213,196,161,0.28);--p-title:#fbf1c7;--p-fx:none"><span class="tp"><span class="tp-fx"><i style="left:16%;top:30%;width:1.6px;height:1.6px;background:#ebc88c;opacity:.4"></i><i style="left:38%;top:18%;width:1.2px;height:1.2px;background:#ebc88c;opacity:.3"></i><i style="left:62%;top:34%;width:1.8px;height:1.8px;background:#ebc88c;opacity:.35"></i><i style="left:78%;top:52%;width:1.4px;height:1.4px;background:#ebc88c;opacity:.32"></i><i style="left:24%;top:58%;width:1.5px;height:1.5px;background:#ebc88c;opacity:.28"></i><i style="left:48%;top:72%;width:2px;height:2px;background:#ebc88c;opacity:.36"></i><i style="left:88%;top:22%;width:1.3px;height:1.3px;background:#ebc88c;opacity:.3"></i></span><span class="tp-title"></span><span class="tp-chips"><i></i><i></i><i></i></span><span class="tp-cards"><i></i><i></i><i></i></span><span class="tp-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></span><span class="tn">gruvbox</span></button>
           <button type="button" class="theme-opt" role="radio" aria-checked="false" data-theme="sakura" style="--p-bg:#1c1017;--p-card:#291720;--p-chip:#3a2130;--p-accent:#ff8fb8;--p-edge:rgba(255, 205, 225,0.16);--p-title:#ffc2d9;--p-fx:radial-gradient(ellipse 70% 46% at 86% 0%, rgba(255,143,184,0.22), transparent 70%), radial-gradient(ellipse 70% 40% at 0% 100%, rgba(255,120,160,0.13), transparent 70%)"><span class="tp"><span class="tp-fx"><i style="left:68%;top:23%;width:5.8px;background:#ffb7d1;height:3.5px;transform:rotate(111deg);opacity:.85"></i><i style="left:75%;top:35%;width:5.6px;background:#ffb7d1;height:3.4px;transform:rotate(101deg);opacity:.85"></i><i style="left:46%;top:70%;width:4.2px;background:#ffb7d1;height:2.5px;transform:rotate(40deg);opacity:.85"></i><i style="left:19%;top:17%;width:4.3px;background:#ffb7d1;height:2.6px;transform:rotate(119deg);opacity:.85"></i><i style="left:77%;top:19%;width:5.7px;background:#ffb7d1;height:3.4px;transform:rotate(121deg);opacity:.85"></i><i style="left:63%;top:36%;width:5.1px;background:#ffb7d1;height:3.1px;transform:rotate(33deg);opacity:.85"></i><i style="left:6%;top:75%;width:5.5px;background:#ffb7d1;height:3.3px;transform:rotate(26deg);opacity:.85"></i><i style="left:51%;top:86%;width:4.9px;background:#ffb7d1;height:2.9px;transform:rotate(49deg);opacity:.85"></i></span><span class="tp-title"></span><span class="tp-chips"><i></i><i></i><i></i></span><span class="tp-cards"><i></i><i></i><i></i></span><span class="tp-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></span><span class="tn">sakura</span></button>
           </div>
         </section>
@@ -1880,6 +1939,10 @@ if (document.readyState === "loading") {
           panicUrl: localStorage.getItem("panicUrl"),
           tabCloakPreset: cookie("tabCloakPreset"),
           favorites: localStorage.getItem("jm-favorites"),
+          recent: localStorage.getItem("jm-recent"),
+          sort: localStorage.getItem("jm-sort"),
+          lastCat: localStorage.getItem("jm-last-cat"),
+          lastQuery: localStorage.getItem("jm-last-query"),
           theme: localStorage.getItem("jm-theme")
         };
         const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
@@ -1909,6 +1972,10 @@ if (document.readyState === "loading") {
               if (d.tabCloakPreset) cookie("tabCloakPreset", d.tabCloakPreset, 365);
               if (d.theme && window.jmApplyTheme) window.jmApplyTheme(d.theme);
               if (d.favorites != null) localStorage.setItem("jm-favorites", typeof d.favorites === "string" ? d.favorites : JSON.stringify(d.favorites));
+              if (d.recent != null) localStorage.setItem("jm-recent", typeof d.recent === "string" ? d.recent : JSON.stringify(d.recent));
+              if (d.sort) localStorage.setItem("jm-sort", d.sort);
+              if (d.lastCat) localStorage.setItem("jm-last-cat", d.lastCat);
+              if (d.lastQuery != null) localStorage.setItem("jm-last-query", d.lastQuery);
               toast("imported, reload recommended");
             } catch (e) {
               toast("invalid file");
@@ -1925,6 +1992,10 @@ if (document.readyState === "loading") {
         localStorage.removeItem("panicKey");
         localStorage.removeItem("panicUrl");
         localStorage.removeItem("jm-favorites");
+        localStorage.removeItem("jm-recent");
+        localStorage.removeItem("jm-sort");
+        localStorage.removeItem("jm-last-cat");
+        localStorage.removeItem("jm-last-query");
         if (window.jmApplyTheme) window.jmApplyTheme("default");
         cookie("tabCloakPreset", "", -1);
         toast("cleared");
@@ -1953,7 +2024,9 @@ if (document.readyState === "loading") {
 let allGames = [];
 let currentCategory = "all";
 let currentQuery = "";
+let currentSort = "default";
 let favorites = [];
+let recentIds = [];
 let currentPlayGame = null;
 
 function loadFavorites() {
@@ -1985,6 +2058,65 @@ function toggleFavorite(id) {
     favorites.splice(i, 1);
   }
   saveFavorites();
+  updateCategoryCounts();
+}
+
+function loadRecent() {
+  try {
+    const raw = localStorage.getItem("jm-recent");
+    recentIds = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(recentIds)) recentIds = [];
+  } catch (e) {
+    recentIds = [];
+  }
+}
+
+function saveRecent() {
+  try {
+    localStorage.setItem("jm-recent", JSON.stringify(recentIds.slice(0, 12)));
+  } catch (e) {}
+}
+
+function pushRecent(id) {
+  id = String(id);
+  recentIds = recentIds.filter(function (x) { return x !== id; });
+  recentIds.unshift(id);
+  if (recentIds.length > 12) recentIds = recentIds.slice(0, 12);
+  saveRecent();
+}
+
+function getRecentGames() {
+  var out = [];
+  for (var i = 0; i < recentIds.length; i++) {
+    var id = recentIds[i];
+    for (var j = 0; j < allGames.length; j++) {
+      if (String(allGames[j].id) === id) {
+        out.push(allGames[j]);
+        break;
+      }
+    }
+    if (out.length >= 8) break;
+  }
+  return out;
+}
+
+function saveViewState() {
+  try {
+    localStorage.setItem("jm-last-cat", currentCategory);
+    localStorage.setItem("jm-last-query", currentQuery);
+    localStorage.setItem("jm-sort", currentSort);
+  } catch (e) {}
+}
+
+function loadViewState() {
+  try {
+    var c = localStorage.getItem("jm-last-cat");
+    if (c) currentCategory = c;
+    var q = localStorage.getItem("jm-last-query");
+    if (q != null) currentQuery = q;
+    var s = localStorage.getItem("jm-sort");
+    if (s === "default" || s === "newest" || s === "name") currentSort = s;
+  } catch (e) {}
 }
 
 function normalizeGamePath(game) {
@@ -2035,7 +2167,7 @@ function createCard(game, index) {
     e.stopPropagation();
     toggleFavorite(game.id);
     fav.classList.toggle("active", isFavorite(game.id));
-    if (currentCategory === "favorites") {
+    if (currentCategory === "favorites" || currentSort === "favorites") {
       render();
     }
   });
@@ -2131,7 +2263,59 @@ function groupRelated(games) {
   return out;
 }
 
-function gridSection(title, games) {
+function gameIndex(game) {
+  for (var i = 0; i < allGames.length; i++) {
+    if (allGames[i] === game || String(allGames[i].id) === String(game.id)) return i;
+  }
+  return 0;
+}
+
+function sortGames(games) {
+  var list = games.slice();
+  if (currentSort === "name") {
+    list.sort(function (a, b) {
+      var ta = String(a.title || a.id || "").toLowerCase();
+      var tb = String(b.title || b.id || "").toLowerCase();
+      if (ta < tb) return -1;
+      if (ta > tb) return 1;
+      return 0;
+    });
+    return list;
+  }
+  if (currentSort === "newest") {
+    list.sort(function (a, b) {
+      return gameIndex(b) - gameIndex(a);
+    });
+    return list;
+  }
+  return groupRelated(list);
+}
+
+function makeSortSelect() {
+  var sel = document.createElement("select");
+  sel.className = "sort-select";
+  sel.setAttribute("aria-label", "sort");
+  var opts = [
+    ["default", "default"],
+    ["newest", "newest"],
+    ["name", "by abc"]
+  ];
+  for (var i = 0; i < opts.length; i++) {
+    var o = document.createElement("option");
+    o.value = opts[i][0];
+    o.textContent = opts[i][1];
+    if (opts[i][0] === currentSort) o.selected = true;
+    sel.appendChild(o);
+  }
+  sel.addEventListener("change", function () {
+    currentSort = sel.value;
+    saveViewState();
+    render();
+  });
+  return sel;
+}
+
+function gridSection(title, games, withSort) {
   const section = document.createElement("section");
   section.className = "section";
   const head = document.createElement("div");
@@ -2140,6 +2324,10 @@ function gridSection(title, games) {
   h2.className = "section-title";
   h2.textContent = title + " (" + games.length + ")";
   head.appendChild(h2);
+  if (withSort) {
+    head.classList.add("has-sort");
+    head.appendChild(makeSortSelect());
+  }
   const grid = document.createElement("div");
   grid.className = "games-grid";
   games.forEach(function (g, i) {
@@ -2148,6 +2336,27 @@ function gridSection(title, games) {
   section.appendChild(head);
   section.appendChild(grid);
   return section;
+}
+
+function updateCategoryCounts() {
+  var buttons = document.querySelectorAll(".cat-btn");
+  for (var i = 0; i < buttons.length; i++) {
+    var btn = buttons[i];
+    var cat = btn.getAttribute("data-category") || "all";
+    var n = 0;
+    if (cat === "all") {
+      n = allGames.length;
+    } else if (cat === "favorites") {
+      n = favorites.length;
+    } else {
+      for (var j = 0; j < allGames.length; j++) {
+        var g = allGames[j];
+        if (g.category === cat || (Array.isArray(g.categories) && g.categories.indexOf(cat) !== -1)) n++;
+      }
+    }
+    var label = cat;
+    btn.textContent = label + " (" + n + ")";
+  }
 }
 
 function showLoading() {
@@ -2168,18 +2377,28 @@ function render() {
   const root = document.getElementById("rows");
   if (!root) return;
   root.innerHTML = "";
-  const filtered = groupRelated(allGames.filter(matches));
-  if (filtered.length === 0) {
-    const empty = document.createElement("div");
-    empty.className = "no-results";
-    if (currentCategory === "favorites") {
-      empty.textContent = currentQuery
-        ? "no favorites"
-        : "no favorites yet, click the star on a game";
-    } else {
-      empty.textContent = "no games found";
+  var showRecent =
+    currentCategory === "all" && !currentQuery && recentIds.length > 0;
+  if (showRecent) {
+    var recent = getRecentGames();
+    if (recent.length) {
+      root.appendChild(gridSection("recently played", recent, false));
     }
-    root.appendChild(empty);
+  }
+  const filtered = sortGames(allGames.filter(matches));
+  if (filtered.length === 0) {
+    if (!showRecent || !getRecentGames().length) {
+      const empty = document.createElement("div");
+      empty.className = "no-results";
+      if (currentCategory === "favorites") {
+        empty.textContent = currentQuery
+          ? "no favorites"
+          : "no favorites yet, click the star on a game";
+      } else {
+        empty.textContent = "no games found";
+      }
+      root.appendChild(empty);
+    }
     return;
   }
   const title =
@@ -2188,7 +2407,7 @@ function render() {
       : currentCategory === "favorites"
         ? "favorites"
         : currentCategory;
-  root.appendChild(gridSection(title, filtered));
+  root.appendChild(gridSection(title, filtered, true));
 }
 
 function setCategory(cat, btn) {
@@ -2199,6 +2418,7 @@ function setCategory(cat, btn) {
       b === btn || b.getAttribute("data-category") === cat,
     );
   });
+  saveViewState();
   render();
 }
 
@@ -2510,11 +2730,13 @@ function goHome() {
     try { frame.src = "about:blank"; } catch (e) {}
   }
   if (typeof window.jmApplyCloak === "function") window.jmApplyCloak();
+  render();
   window.scrollTo(0, 0);
 }
 
 function goPlay(game) {
   if (!game || !game.id) return;
+  pushRecent(game.id);
   currentPlayGame = game;
   const home = document.getElementById("view-home");
   const play = document.getElementById("view-play");
@@ -2535,6 +2757,8 @@ window.jmGetCurrentPlay = function () { return currentPlayGame; };
 
 function init() {
   loadFavorites();
+  loadRecent();
+  loadViewState();
   const nav = document.querySelector(".categories");
   if (nav) {
     nav.addEventListener("click", function (e) {
@@ -2546,8 +2770,10 @@ function init() {
   }
   const search = document.getElementById("search-input");
   if (search) {
+    if (currentQuery) search.value = currentQuery;
     search.addEventListener("input", function (e) {
       currentQuery = e.target.value.trim().toLowerCase();
+      saveViewState();
       render();
     });
   }
@@ -2567,6 +2793,13 @@ function init() {
     .then(function (data) {
       allGames = Array.isArray(data) ? data : [];
       setSearchPlaceholder();
+      updateCategoryCounts();
+      document.querySelectorAll(".cat-btn").forEach(function (b) {
+        b.classList.toggle(
+          "active",
+          b.getAttribute("data-category") === currentCategory,
+        );
+      });
       render();
     })
     .catch(function () {
@@ -3106,42 +3339,6 @@ window.jmPlay = { init: init, enter: enter, leave: leave };
   var cur = "default";
   try { cur = localStorage.getItem("jm-theme") || "default"; } catch (e) {}
   apply(cur);
-})();
-  </script>
-  <script>
-(function () {
-  var neko = document.getElementById("oneko");
-  if (!neko) return;
-  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  var size = 50;
-  var sets = {
-    sleeping: [[-2, 0], [-2, -1]],
-    wakeup: [[-5, 0], [-6, 0], [-7, 0], [-3, -2], [-3, -3]]
-  };
-  var waking = false;
-  var wake = 0;
-  var frame = 0;
-  function setSprite(name, i) {
-    var s = sets[name][i % sets[name].length];
-    neko.style.backgroundPosition = (s[0] * size) + "px " + (s[1] * size) + "px";
-  }
-  neko.addEventListener("mouseenter", function () {
-    waking = true;
-    wake = 0;
-  });
-  neko.addEventListener("mouseleave", function () {
-    waking = false;
-  });
-  setInterval(function () {
-    if (waking) {
-      var idx = Math.floor(wake / 5);
-      setSprite("wakeup", Math.min(idx, sets.wakeup.length - 1));
-      wake += 1;
-    } else {
-      setSprite("sleeping", Math.floor(frame / 4));
-    }
-    frame += 1;
-  }, 100);
 })();
   </script>
 </body>
