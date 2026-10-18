@@ -2834,7 +2834,15 @@ function gameDir(game) {
   return JM_ASSETS + "/" + p;
 }
 
+function jmFixStorage(html) {
+  // emulator games point at ../../storage/emulatorjs/ which isn't in the assets repo: use the official EmulatorJS CDN
+  return html
+    .replace(/(?:\.\.\/)+storage\/emulatorjs\/data\//g, "https://cdn.emulatorjs.org/stable/data/")
+    .replace(/(?:\.\.\/)+storage\/ruffle\/ruffle\.js/g, "https://unpkg.com/@ruffle-rs/ruffle");
+}
+
 function jmInjectBase(html, dir, extra) {
+  html = jmFixStorage(html);
   var tag = '<base href="' + dir + '">' + (extra || "");
   if (/<head[^>]*>/i.test(html)) return html.replace(/<head[^>]*>/i, function (m) { return m + tag; });
   return tag + html;
