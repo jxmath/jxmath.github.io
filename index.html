@@ -1165,9 +1165,11 @@ html {
       <nav class="categories">
         <button type="button" class="cat-btn active" data-category="all">all</button>
         <button type="button" class="cat-btn" data-category="favorites">favorites</button>
+        <button type="button" class="cat-btn" data-category="flash">flash</button>
+        <button type="button" class="cat-btn" data-category="2 player">2 player</button>
+        <button type="button" class="cat-btn" data-category="emulator">emulator</button>
         <button type="button" class="cat-btn" data-category="adventure">adventure</button>
         <button type="button" class="cat-btn" data-category="arcade">arcade</button>
-        <button type="button" class="cat-btn" data-category="fighting">fighting</button>
         <button type="button" class="cat-btn" data-category="horror">horror</button>
         <button type="button" class="cat-btn" data-category=".io">.io</button>
         <button type="button" class="cat-btn" data-category="platformer">platformer</button>
@@ -1720,7 +1722,11 @@ function matches(game) {
   if (currentCategory === "favorites") {
     okC = isFavorite(game.id);
   } else {
-    okC = currentCategory === "all" || game.category === currentCategory;
+    okC =
+      currentCategory === "all" ||
+      game.category === currentCategory ||
+      (Array.isArray(game.categories) &&
+        game.categories.indexOf(currentCategory) !== -1);
   }
   return okQ && okC;
 }
