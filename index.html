@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -75,7 +74,6 @@ body:not(.play-body) {
   flex: 1;
 }
 
-
 header {
   padding-top: 28px;
   padding-bottom: 8px;
@@ -142,22 +140,6 @@ header {
   font-weight: 600;
   color: #ffffff;
   margin-bottom: 22px;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-@media (max-width: 560px) {
 }
 
 .categories {
@@ -277,13 +259,16 @@ header {
   padding: 0;
   transition: color 0.15s ease, background 0.15s ease, transform 0.15s ease;
 }
+
 .fav-btn:hover {
   background: rgba(0, 0, 0, 0.7);
   transform: scale(1.08);
 }
+
 .fav-btn.active {
   color: #ffd166;
 }
+
 .fav-btn svg {
   display: block;
   pointer-events: none;
@@ -599,7 +584,6 @@ header {
   }
 }
 
-
 @keyframes fade-down {
   from {
     opacity: 0;
@@ -678,7 +662,6 @@ header {
     transition: none !important;
   }
 }
-
 
 .top-bar {
   display: flex;
@@ -948,7 +931,6 @@ body.modal-open {
   }
 }
 
-
 .play-stage:fullscreen .play-bar,
 .play-stage:-webkit-full-screen .play-bar {
   display: none !important;
@@ -959,9 +941,6 @@ body.modal-open {
   flex: 1;
   height: 100%;
 }
-
-
-
 
 .site-footer {
   display: block;
@@ -1106,7 +1085,6 @@ html {
   color: rgba(255,255,255,0.7);
 }
 
-
 .frame-notfound {
   position: absolute;
   inset: 0;
@@ -1201,7 +1179,7 @@ html {
   </div>
   <div class="play-shell">
     <div class="play-top">
-      <a class="back-btn" href="#">back</a>
+      <button type="button" class="back-btn" id="back-btn">back</button>
       <button type="button" class="settings-btn play-settings" id="settings-btn-play" aria-label="settings" title="settings">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="3"/>
@@ -1334,7 +1312,6 @@ if (document.readyState === "loading") {
 }
   </script>
   <script>
-
 (function () {
   const PRESETS = {
     google: { title: "Google", favicon: "https://www.google.com/favicon.ico" },
@@ -1622,6 +1599,8 @@ let allGames = [];
 let currentCategory = "all";
 let currentQuery = "";
 let favorites = [];
+let currentPlayGame = null;
+
 function loadFavorites() {
   try {
     const raw = localStorage.getItem("jm-favorites");
@@ -1631,14 +1610,17 @@ function loadFavorites() {
     favorites = [];
   }
 }
+
 function saveFavorites() {
   try {
     localStorage.setItem("jm-favorites", JSON.stringify(favorites));
   } catch (e) {}
 }
+
 function isFavorite(id) {
   return favorites.indexOf(String(id)) !== -1;
 }
+
 function toggleFavorite(id) {
   id = String(id);
   const i = favorites.indexOf(id);
@@ -1649,11 +1631,7 @@ function toggleFavorite(id) {
   }
   saveFavorites();
 }
-function playHref(game) {
-  var id = game && game.id ? String(game.id) : "";
-  if (!id) return "#";
-  return "#" + encodeURIComponent(id);
-}
+
 function normalizeGamePath(game) {
   var id = game && game.id ? String(game.id) : "";
   if (!id) return "";
@@ -1663,43 +1641,40 @@ function normalizeGamePath(game) {
   if (path.slice(-1) !== "/") path += "/";
   return path;
 }
+
 function createCard(game, index) {
-  const a = document.createElement("a");
+  const a = document.createElement("div");
   a.className = "game-card";
-  a.href = playHref(game);
   a.style.animationDelay = (index % 20) * 25 + "ms";
   a.setAttribute("data-id", game.id || "");
+  a.setAttribute("role", "button");
+  a.tabIndex = 0;
+
   a.addEventListener("click", function () {
-    try {
-      if (game && game.id) {
-        sessionStorage.setItem("jm-play-id", String(game.id));
-        sessionStorage.setItem(
-          "jm-play-game",
-          JSON.stringify({
-            id: game.id,
-            title: game.title || game.id,
-            category: game.category || "",
-            path: normalizeGamePath(game),
-            thumbnail: game.thumbnail || "",
-          }),
-        );
-      }
-    } catch (e) {}
+    goPlay(game);
   });
+
+  a.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      goPlay(game);
+    }
+  });
+
   if (game.thumbnail) {
-    a.style.backgroundImage =
-      "url('" + game.thumbnail.replace(/'/g, "%27") + "')";
+    a.style.backgroundImage = "url('" + game.thumbnail.replace(/'/g, "%27") + "')";
   }
+
   const title = document.createElement("h2");
   title.className = "game-title";
   title.textContent = game.title || game.id;
   a.appendChild(title);
+
   const fav = document.createElement("button");
   fav.type = "button";
   fav.className = "fav-btn" + (isFavorite(game.id) ? " active" : "");
   fav.setAttribute("aria-label", "favorite");
-  fav.innerHTML =
-    '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
+  fav.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
   fav.addEventListener("click", function (e) {
     e.preventDefault();
     e.stopPropagation();
@@ -1712,6 +1687,7 @@ function createCard(game, index) {
   a.appendChild(fav);
   return a;
 }
+
 function matches(game) {
   const q = currentQuery;
   const okQ =
@@ -1730,6 +1706,7 @@ function matches(game) {
   }
   return okQ && okC;
 }
+
 function seriesKey(game) {
   var t = String(game.title || game.id || "")
     .toLowerCase()
@@ -1752,6 +1729,7 @@ function seriesKey(game) {
     .trim();
   return t || String(game.id || game.title || "").toLowerCase();
 }
+
 function seriesOrder(game) {
   var t = String(game.title || game.id || "")
     .toLowerCase()
@@ -1765,6 +1743,7 @@ function seriesOrder(game) {
   if (m && roman[m[1]] != null) return roman[m[1]];
   return 0;
 }
+
 function groupRelated(games) {
   var groups = {};
   var order = [];
@@ -1796,6 +1775,7 @@ function groupRelated(games) {
   }
   return out;
 }
+
 function gridSection(title, games) {
   const section = document.createElement("section");
   section.className = "section";
@@ -1814,18 +1794,21 @@ function gridSection(title, games) {
   section.appendChild(grid);
   return section;
 }
+
 function showLoading() {
   const root = document.getElementById("rows");
   if (!root) return;
   root.innerHTML =
     '<div class="games-loading" aria-label="loading"><div class="loading-spinner"></div><span>loading games</span></div>';
 }
+
 function setSearchPlaceholder() {
   const input = document.getElementById("search-input");
   if (input) {
     input.placeholder = "search through " + allGames.length + " games";
   }
 }
+
 function render() {
   const root = document.getElementById("rows");
   if (!root) return;
@@ -1852,6 +1835,7 @@ function render() {
         : currentCategory;
   root.appendChild(gridSection(title, filtered));
 }
+
 function setCategory(cat, btn) {
   currentCategory = cat;
   document.querySelectorAll(".cat-btn").forEach(function (b) {
@@ -1862,6 +1846,7 @@ function setCategory(cat, btn) {
   });
   render();
 }
+
 function initParticles() {
   const canvas = document.getElementById("particles");
   if (!canvas) return;
@@ -1915,6 +1900,42 @@ function initParticles() {
     spawn();
   });
 }
+
+function goHome() {
+  const home = document.getElementById("view-home");
+  const play = document.getElementById("view-play");
+  if (home) home.hidden = false;
+  if (play) play.hidden = true;
+  document.body.classList.remove("play-body");
+  currentPlayGame = null;
+  const frame = document.getElementById("play-frame");
+  if (frame) {
+    try { frame.src = "about:blank"; } catch (e) {}
+  }
+  if (typeof window.jmApplyCloak === "function") window.jmApplyCloak();
+  window.scrollTo(0, 0);
+}
+
+function goPlay(game) {
+  if (!game || !game.id) return;
+  currentPlayGame = game;
+  const home = document.getElementById("view-home");
+  const play = document.getElementById("view-play");
+  if (home) home.hidden = true;
+  if (play) play.hidden = false;
+  document.body.classList.add("play-body");
+  if (!window.__jmPlayStarted) {
+    window.__jmPlayStarted = true;
+    if (window.jmPlay && window.jmPlay.init) window.jmPlay.init();
+  }
+  if (window.jmPlay && window.jmPlay.enter) window.jmPlay.enter(game);
+  window.scrollTo(0, 0);
+}
+
+window.jmGoPlay = goPlay;
+window.jmGoHome = goHome;
+window.jmGetCurrentPlay = function () { return currentPlayGame; };
+
 function init() {
   loadFavorites();
   const nav = document.querySelector(".categories");
@@ -1931,6 +1952,12 @@ function init() {
     search.addEventListener("input", function (e) {
       currentQuery = e.target.value.trim().toLowerCase();
       render();
+    });
+  }
+  const back = document.getElementById("back-btn");
+  if (back) {
+    back.addEventListener("click", function () {
+      goHome();
     });
   }
   initParticles();
@@ -1953,6 +1980,7 @@ function init() {
       }
     });
 }
+
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", init);
 } else {
@@ -1962,70 +1990,6 @@ if (document.readyState === "loading") {
   </script>
   <script>
 (function () {
-function readId() {
-  const hash = location.hash.replace(/^#\/?/, "").trim();
-  if (hash) {
-    try { return decodeURIComponent(hash).trim(); }
-    catch (e) { return hash.trim(); }
-  }
-
-  const params = new URLSearchParams(location.search);
-  let id = params.get("id") || params.get("game");
-  if (id) {
-    try { return decodeURIComponent(id.replace(/\+/g, " ")).trim(); }
-    catch (e) { return id.trim(); }
-  }
-
-  const parts = location.pathname.split("/").filter(Boolean);
-  if (parts.length >= 2) {
-    const head = parts[0].toLowerCase();
-    if (head === "play" || head === "play.html") {
-      const tail = parts[parts.length - 1];
-      if (tail && tail.toLowerCase() !== "play" && tail.toLowerCase() !== "play.html") {
-        try { return decodeURIComponent(tail).trim(); }
-        catch (e) { return tail.trim(); }
-      }
-    }
-  }
-
-  try {
-    const stored = sessionStorage.getItem("jm-play-id");
-    if (stored) return stored.trim();
-  } catch (e) {}
-
-  return "";
-}
-
-function readStoredGame(id) {
-  try {
-    const raw = sessionStorage.getItem("jm-play-game");
-    if (!raw) return null;
-    const game = JSON.parse(raw);
-    if (!game || !game.id) return null;
-    if (id && String(game.id) !== String(id)) return null;
-    return game;
-  } catch (e) {
-    return null;
-  }
-}
-
-function absUrl(rel) {
-  if (!rel) return "";
-  try { return new URL(rel, location.href).href; }
-  catch (e) { return rel; }
-}
-
-function gameSrc(game) {
-  if (!game || !game.id) return "";
-  if (game.path) {
-    let path = String(game.path);
-    if (path.charAt(0) === "/") path = path.slice(1);
-    return absUrl(path);
-  }
-  return absUrl("g/" + game.id + "/");
-}
-
-
 function gameDir(game) {
   var p = game && game.path ? String(game.path) : "g/" + game.id + "/";
   if (p.charAt(0) === "/") p = p.slice(1);
@@ -2055,11 +2019,6 @@ function jmLoadGame(frame, game) {
       doc.close();
     })
     .catch(function () { go404(); });
-}
-
-function playHref(game) {
-  if (!game || !game.id) return "#";
-  return "#" + encodeURIComponent(game.id);
 }
 
 function shuffle(arr) {
@@ -2096,20 +2055,6 @@ function pickRecommended(current, list, limit) {
   return out;
 }
 
-function storeGame(game) {
-  if (!game || !game.id) return;
-  try {
-    sessionStorage.setItem("jm-play-id", String(game.id));
-    sessionStorage.setItem("jm-play-game", JSON.stringify({
-      id: game.id,
-      title: game.title || game.id,
-      category: game.category || "",
-      path: game.path || ("g/" + game.id + "/index.html"),
-      thumbnail: game.thumbnail || ""
-    }));
-  } catch (e) {}
-}
-
 function getTransition() {
   return document.getElementById("page-transition");
 }
@@ -2133,21 +2078,26 @@ function runTransition(cb) {
 }
 
 function createRecCard(game, index) {
-  const a = document.createElement("a");
+  const a = document.createElement("div");
   a.className = "game-card";
-  a.href = playHref(game);
   a.style.animationDelay = ((index % 12) * 25) + "ms";
   a.setAttribute("data-id", game.id || "");
+  a.setAttribute("role", "button");
+  a.tabIndex = 0;
 
-  a.addEventListener("click", function (e) {
-    e.preventDefault();
+  a.addEventListener("click", function () {
     runTransition(function () {
-      storeGame(game);
-      history.pushState(null, "", playHref(game));
-      show(game);
-      loadRecommended(game);
-      window.scrollTo(0, 0);
+      if (window.jmGoPlay) window.jmGoPlay(game);
     });
+  });
+
+  a.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      runTransition(function () {
+        if (window.jmGoPlay) window.jmGoPlay(game);
+      });
+    }
   });
 
   if (game.thumbnail) {
@@ -2394,10 +2344,7 @@ function show(game) {
     return;
   }
 
-  storeGame(game);
-
   const title = game.title || game.id || "";
-  const src = gameSrc(game);
   const titleEl = document.getElementById("play-title");
   const catEl = document.getElementById("play-cat");
   const frame = document.getElementById("play-frame");
@@ -2406,7 +2353,7 @@ function show(game) {
   if (titleEl) titleEl.textContent = title;
   if (catEl) catEl.textContent = game.category || "";
 
-  if (frame && src) {
+  if (frame) {
     const nf = document.getElementById("frame-notfound");
     if (nf) nf.hidden = true;
     if (loader) loader.classList.add("active");
@@ -2446,78 +2393,6 @@ function show(game) {
   setTimeout(hideTransition, 120);
 }
 
-function notFound() {
-  go404();
-}
-
-function fromId(id) {
-  return {
-    id: id,
-    title: id.replace(/-/g, " "),
-    category: "",
-    path: "g/" + id + "/"
-  };
-}
-
-function initParticles() {
-  const canvas = document.getElementById("particles");
-  if (!canvas) return;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return;
-
-  let w = 0;
-  let h = 0;
-  let particles = [];
-  const count = 50;
-
-  function resize() {
-    w = canvas.width = window.innerWidth;
-    h = canvas.height = window.innerHeight;
-  }
-
-  function spawn() {
-    particles = [];
-    for (let i = 0; i < count; i++) {
-      particles.push({
-        x: Math.random() * w,
-        y: Math.random() * h,
-        r: Math.random() * 3.2 + 1.4,
-        vx: (Math.random() - 0.5) * 0.15,
-        vy: Math.random() * 0.9 + 0.35,
-        a: Math.random() * 0.4 + 0.15
-      });
-    }
-  }
-
-  function tick() {
-    ctx.clearRect(0, 0, w, h);
-    for (let i = 0; i < particles.length; i++) {
-      const p = particles[i];
-      p.x += p.vx;
-      p.y += p.vy;
-      if (p.x < 0) p.x = w;
-      if (p.x > w) p.x = 0;
-      if (p.y > h) {
-        p.y = -4;
-        p.x = Math.random() * w;
-      }
-      ctx.beginPath();
-      ctx.fillStyle = "rgba(255,255,255," + p.a + ")";
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    requestAnimationFrame(tick);
-  }
-
-  resize();
-  spawn();
-  tick();
-  window.addEventListener("resize", function () {
-    resize();
-    spawn();
-  });
-}
-
 function openAboutBlank(game) {
   const w = window.open("about:blank", "_blank");
   if (!w) return;
@@ -2533,45 +2408,14 @@ function openAboutBlank(game) {
     .catch(function () { try { w.close(); } catch (e) {} });
 }
 
-function enter() {
+function enter(game) {
   hideTransition();
-
-  let id = readId();
-  let cached = id ? readStoredGame(id) : readStoredGame("");
-  if (!id && cached && cached.id) id = cached.id;
-
-  if (!id) {
-    notFound();
-  } else if (cached) {
-    show(cached);
-    loadRecommended(cached);
-  } else {
-    jmFetchGames()
-      .then(function (r) {
-        if (!r.ok) throw new Error("games.json");
-        return r.json();
-      })
-      .then(function (games) {
-        const key = id.toLowerCase();
-        const list = Array.isArray(games) ? games : [];
-        let game = null;
-        for (let i = 0; i < list.length; i++) {
-          const g = list[i];
-          if (g && (g.id === id || String(g.id).toLowerCase() === key)) {
-            game = g;
-            break;
-          }
-        }
-        const chosen = game || fromId(id);
-        show(chosen);
-        if (game) renderRecommended(chosen, list);
-        else loadRecommended(chosen);
-      })
-      .catch(function () {
-        show(fromId(id));
-      });
+  if (!game || !game.id) {
+    go404();
+    return;
   }
-
+  show(game);
+  loadRecommended(game);
 }
 
 function init() {
@@ -2591,12 +2435,9 @@ function init() {
   const blankBtn = document.getElementById("btn-blank");
   if (blankBtn) {
     blankBtn.addEventListener("click", function () {
-      let id = readId();
-      if (!id) {
-        try { id = sessionStorage.getItem("jm-play-id") || ""; } catch (e) {}
-      }
-      if (!id) return;
-      openAboutBlank(readStoredGame(id) || fromId(id));
+      const game = window.jmGetCurrentPlay ? window.jmGetCurrentPlay() : null;
+      if (!game) return;
+      openAboutBlank(game);
     });
   }
 }
@@ -2612,35 +2453,11 @@ window.jmPlay = { init: init, enter: enter, leave: leave };
   </script>
   <script>
 (function () {
-  var home = document.getElementById("view-home");
-  var play = document.getElementById("view-play");
-  var started = false;
-  function wantsPlay() {
-    var hash = location.hash.replace(/^#\/?/, "").trim();
-    var q = new URLSearchParams(location.search);
-    return !!(hash || q.get("id") || q.get("game"));
-  }
-  function route() {
-    window.scrollTo(0, 0);
-    if (wantsPlay()) {
-      home.hidden = true;
-      play.hidden = false;
-      document.body.classList.add("play-body");
-      if (!started) { started = true; jmPlay.init(); }
-      jmPlay.enter();
-    } else {
-      jmPlay.leave();
-      play.hidden = true;
-      home.hidden = false;
-      document.body.classList.remove("play-body");
-      if (typeof window.jmApplyCloak === "function") window.jmApplyCloak();
-    }
-  }
   var ps = document.getElementById("settings-btn-play");
-  if (ps) ps.addEventListener("click", function () { document.getElementById("settings-btn").click(); });
-  window.addEventListener("popstate", route);
-  window.addEventListener("hashchange", route);
-  route();
+  if (ps) ps.addEventListener("click", function () {
+    var btn = document.getElementById("settings-btn");
+    if (btn) btn.click();
+  });
 })();
   </script>
 </body>
