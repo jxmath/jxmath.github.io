@@ -1,4 +1,4 @@
-# jxmath.github.io
+# jxmath.shop
 
 just a game site i made for school
 
