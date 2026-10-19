@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>jaxsons math</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="dns-prefetch" href="https://api.github.com">
   <script>try{var t=localStorage.getItem("jm-theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
   <style>
 :root {
@@ -1697,6 +1699,41 @@ function jmResolveAssets() {
   return JM_ASSETS_READY;
 }
 
+var JM_BG_IO = ("IntersectionObserver" in window) ? new IntersectionObserver(function (entries) {
+  entries.forEach(function (en) {
+    if (!en.isIntersecting) return;
+    var el = en.target;
+    JM_BG_IO.unobserve(el);
+    var u = el.getAttribute("data-bg");
+    if (u) { el.style.backgroundImage = "url('" + u.replace(/'/g, "%27") + "')"; el.removeAttribute("data-bg"); }
+  });
+}, { rootMargin: "600px 0px" }) : null;
+
+function jmLazyBg(el, url) {
+  if (!JM_BG_IO) { el.style.backgroundImage = "url('" + String(url).replace(/'/g, "%27") + "')"; return; }
+  el.setAttribute("data-bg", String(url));
+  JM_BG_IO.observe(el);
+}
+
+var JM_SW_READY = (function () {
+  if (!("serviceWorker" in navigator) || !window.isSecureContext) return Promise.resolve(false);
+  var reg = navigator.serviceWorker.register("sw.js").then(function () {
+    return navigator.serviceWorker.ready;
+  }).then(function () { return true; });
+  return Promise.race([
+    reg,
+    new Promise(function (res) { setTimeout(function () { res(false); }, 6000); })
+  ]).catch(function () { return false; });
+})();
+
+function jmGameUrl(game) {
+  var p = game && game.path ? String(game.path) : "g/" + game.id + "/index.html";
+  if (p.charAt(0) === "/") p = p.slice(1);
+  if (!/\.html?$/i.test(p)) p = p.replace(/\/?$/, "/") + "index.html";
+  var sha = String(JM_ASSETS).split("@").pop();
+  return new URL("_g/" + sha + "/" + p, location.href).href;
+}
+
 function jmFetchGames() {
   return jmResolveAssets().then(function () {
     return fetch(JM_ASSETS + "/games.json").then(function (r) {
@@ -2177,7 +2214,7 @@ function createCard(game, index) {
   });
 
   if (game.thumbnail) {
-    a.style.backgroundImage = "url('" + game.thumbnail.replace(/'/g, "%27") + "')";
+    jmLazyBg(a, game.thumbnail);
   }
 
   const title = document.createElement("h2");
@@ -2730,6 +2767,7 @@ function goHome() {
   if (play) play.hidden = true;
   document.body.classList.remove("play-body");
   currentPlayGame = null;
+  if (window.jmCancelGame) window.jmCancelGame();
   const frame = document.getElementById("play-frame");
   if (frame) {
     try { frame.src = "about:blank"; } catch (e) {}
@@ -2848,21 +2886,105 @@ function jmInjectBase(html, dir, extra) {
   return tag + html;
 }
 
-function jmLoadGame(frame, game) {
+var jmGameToken = 0;
+var jmGameAbort = null;
+var jmReadyTimer = null;
+var jmFrameOnLoad = null;
+
+function jmCancelGame() {
+  jmGameToken++;
+  if (jmGameAbort) { try { jmGameAbort.abort(); } catch (e) {} jmGameAbort = null; }
+  if (jmReadyTimer) { clearInterval(jmReadyTimer); jmReadyTimer = null; }
+  var frame = document.getElementById("play-frame");
+  if (frame && jmFrameOnLoad) { frame.removeEventListener("load", jmFrameOnLoad); jmFrameOnLoad = null; }
+  var loader = document.getElementById("frame-loader");
+  if (loader) loader.classList.remove("active");
+}
+
+function jmLoadGame(frame, game, token) {
+  JM_SW_READY.then(function (ok) {
+    if (token !== jmGameToken) return;
+    if (ok) {
+      try { frame.removeAttribute("srcdoc"); } catch (e) {}
+      frame.src = jmGameUrl(game);
+    } else {
+      jmLoadGameDoc(frame, game, token);
+    }
+  });
+}
+
+function jmLoadGameDoc(frame, game, token) {
   var dir = gameDir(game);
-  fetch(dir + "index.html")
+  var ctl = new AbortController();
+  jmGameAbort = ctl;
+  fetch(dir + "index.html", { signal: ctl.signal })
     .then(function (r) {
       if (!r.ok) throw new Error("game " + r.status);
       return r.text();
     })
     .then(function (html) {
+      if (token !== jmGameToken) return;
       html = jmInjectBase(html, dir);
       var doc = frame.contentDocument || (frame.contentWindow && frame.contentWindow.document);
       doc.open();
       doc.write(html);
       doc.close();
     })
-    .catch(function () { go404(); });
+    .catch(function () {
+      if (token === jmGameToken && !ctl.signal.aborted) go404();
+    });
+}
+
+window.jmCancelGame = jmCancelGame;
+
+function jmEngineReady(win) {
+  try {
+    var doc = win.document;
+    if (typeof win.cr_getC2Runtime === "function") {
+      var rt = win.cr_getC2Runtime();
+      if (rt) return rt.isloading === false || rt.isLoading === false;
+    }
+    if (win.unityInstance || win.gameInstance) return true;
+    if (win.Module && win.Module.calledRun) return true;
+    if (win.EJS_emulator) return !!win.EJS_emulator.started;
+    var rp = doc.querySelector("ruffle-player, ruffle-embed");
+    if (rp) return !!rp.metadata;
+    var cv = doc.querySelector("canvas");
+    if (cv) return cv.width > 0 && cv.height > 0 && cv.getBoundingClientRect().width > 0;
+    var b = doc.body;
+    return !!(b && (b.innerText || "").trim().length > 0 && doc.readyState === "complete");
+  } catch (e) {
+    return true;
+  }
+}
+
+function jmWatchReady(frame, token) {
+  var loader = document.getElementById("frame-loader");
+  var label = loader ? loader.querySelector(".frame-loader-label") : null;
+  var base = label ? label.textContent : "";
+  var t0 = Date.now();
+  var stable = 0;
+  if (jmReadyTimer) clearInterval(jmReadyTimer);
+  jmReadyTimer = setInterval(function () {
+    if (token !== jmGameToken) { clearInterval(jmReadyTimer); jmReadyTimer = null; return; }
+    var waited = Date.now() - t0;
+    var win = frame.contentWindow;
+    if (win && jmEngineReady(win)) stable++; else stable = 0;
+    if (stable >= 2) {
+      clearInterval(jmReadyTimer);
+      jmReadyTimer = null;
+      if (loader) loader.classList.remove("active");
+      if (label) label.textContent = base;
+    } else if (waited > 25000 && label) {
+      label.textContent = "still loading...";
+    }
+    if (waited > 120000) {
+      clearInterval(jmReadyTimer);
+      jmReadyTimer = null;
+      if (loader) loader.classList.remove("active");
+      if (label) label.textContent = base;
+    }
+  }, 500);
 }
 
 function shuffle(arr) {
@@ -2945,7 +3067,7 @@ function createRecCard(game, index) {
   });
 
   if (game.thumbnail) {
-    a.style.backgroundImage = "url('" + String(game.thumbnail).replace(/'/g, "%27") + "')";
+    jmLazyBg(a, game.thumbnail);
   }
 
   const title = document.createElement("h2");
@@ -3165,6 +3287,7 @@ function bindVolumeUI() {
 }
 
 function go404() {
+  jmCancelGame();
   const frame = document.getElementById("play-frame");
   const loader = document.getElementById("frame-loader");
   const nf = document.getElementById("frame-notfound");
@@ -3218,12 +3341,15 @@ function show(game) {
   if (frame) {
     const nf = document.getElementById("frame-notfound");
     if (nf) nf.hidden = true;
-    if (loader) loader.classList.add("active");
     bindFrameMute(frame);
+    jmCancelGame();
+    const token = jmGameToken;
+    if (loader) loader.classList.add("active");
 
     function onLoad() {
       frame.removeEventListener("load", onLoad);
-      if (loader) loader.classList.remove("active");
+      if (jmFrameOnLoad === onLoad) jmFrameOnLoad = null;
+      if (token !== jmGameToken) return;
       try {
         const doc = frame.contentDocument || (frame.contentWindow && frame.contentWindow.document);
         if (doc) {
@@ -3238,14 +3364,12 @@ function show(game) {
         muteAlerts(frame.contentWindow);
         applyFrameVolume();
       } catch (e) {}
+      jmWatchReady(frame, token);
     }
+    jmFrameOnLoad = onLoad;
     frame.addEventListener("load", onLoad);
 
-    setTimeout(function () {
-      if (loader) loader.classList.remove("active");
-    }, 12000);
-
-    jmLoadGame(frame, game);
+    jmLoadGame(frame, game, token);
   } else {
     go404();
     return;
@@ -3258,16 +3382,24 @@ function show(game) {
 function openAboutBlank(game) {
   const w = window.open("about:blank", "_blank");
   if (!w) return;
-  const dir = gameDir(game);
-  fetch(dir + "index.html")
-    .then(function (r) { if (!r.ok) throw new Error("game"); return r.text(); })
-    .then(function (html) {
-      html = jmInjectBase(html, dir, "<script>window.alert=function(){};window.confirm=function(){return false};window.prompt=function(){return null};<\/script>");
+  JM_SW_READY.then(function (ok) {
+    if (ok) {
       w.document.open();
-      w.document.write(html);
+      w.document.write('<!DOCTYPE html><html><head><title>' + (game.title || "") + '</title><style>html,body{margin:0;height:100%;background:#000}iframe{border:0;width:100%;height:100%}</style></head><body><iframe src="' + jmGameUrl(game) + '" allow="autoplay; fullscreen; gamepad; clipboard-read; clipboard-write" allowfullscreen></iframe></body></html>');
       w.document.close();
-    })
-    .catch(function () { try { w.close(); } catch (e) {} });
+      return;
+    }
+    const dir = gameDir(game);
+    fetch(dir + "index.html")
+      .then(function (r) { if (!r.ok) throw new Error("game"); return r.text(); })
+      .then(function (html) {
+        html = jmInjectBase(html, dir, "<script>window.alert=function(){};window.confirm=function(){return false};window.prompt=function(){return null};<\/script>");
+        w.document.open();
+        w.document.write(html);
+        w.document.close();
+      })
+      .catch(function () { try { w.close(); } catch (e) {} });
+  });
 }
 
 function enter(game) {
@@ -3305,6 +3437,7 @@ function init() {
 }
 
 function leave() {
+  jmCancelGame();
   const frame = document.getElementById("play-frame");
   if (frame) { try { frame.src = "about:blank"; } catch (e) {} }
 }
