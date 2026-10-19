@@ -6,7 +6,7 @@
   <title>jaxsons math</title>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="dns-prefetch" href="https://api.github.com">
-  <script>try{var t=localStorage.getItem("jm-theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+  <script>try{var t=localStorage.getItem("jm-theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}try{if("scrollRestoration"in history)history.scrollRestoration="manual"}catch(e){}</script>
   <style>
 :root {
   --bg: #0b1020;
@@ -2042,6 +2042,7 @@ if (document.readyState === "loading") {
     m.hidden = false;
     m.classList.remove("closing");
     document.body.classList.add("modal-open");
+    try { localStorage.setItem("jm-modal-open", "1"); } catch (e) {}
     requestAnimationFrame(function () {
       m.classList.add("open");
     });
@@ -2052,6 +2053,7 @@ if (document.readyState === "loading") {
     if (!m || m.hidden) return;
     m.classList.remove("open");
     m.classList.add("closing");
+    try { localStorage.removeItem("jm-modal-open"); } catch (e) {}
     setTimeout(function () {
       m.hidden = true;
       m.classList.remove("closing");
@@ -2191,6 +2193,8 @@ if (document.readyState === "loading") {
         localStorage.removeItem("jm-collapsed");
         localStorage.removeItem("jm-last-cat");
         localStorage.removeItem("jm-last-query");
+        localStorage.removeItem("jm-last-play");
+        localStorage.removeItem("jm-modal-open");
         if (window.jmApplyTheme) window.jmApplyTheme("default");
         cookie("tabCloakPreset", "", -1);
         toast("cleared");
@@ -2911,6 +2915,7 @@ function goHome() {
   if (play) play.hidden = true;
   document.body.classList.remove("play-body");
   currentPlayGame = null;
+  try { localStorage.removeItem("jm-last-play"); } catch (e) {}
   if (window.jmCancelGame) window.jmCancelGame();
   const frame = document.getElementById("play-frame");
   if (frame) {
@@ -2925,6 +2930,7 @@ function goPlay(game) {
   if (!game || !game.id) return;
   pushRecent(game.id);
   currentPlayGame = game;
+  try { localStorage.setItem("jm-last-play", String(game.id)); } catch (e) {}
   const home = document.getElementById("view-home");
   const play = document.getElementById("view-play");
   if (home) home.hidden = true;
@@ -2942,11 +2948,16 @@ window.jmGoPlay = goPlay;
 window.jmGoHome = goHome;
 window.jmGetCurrentPlay = function () { return currentPlayGame; };
 
+window.addEventListener("pageshow", function () {
+  window.scrollTo(0, 0);
+});
+
 function init() {
   loadFavorites();
   loadRecent();
   loadCollapsed();
   loadViewState();
+  window.scrollTo(0, 0);
   const nav = document.querySelector(".categories");
   if (nav) {
     nav.addEventListener("click", function (e) {
@@ -2988,6 +2999,22 @@ function init() {
         );
       });
       render();
+      var lastPlay = null;
+      try { lastPlay = localStorage.getItem("jm-last-play"); } catch (e) {}
+      if (lastPlay) {
+        var found = null;
+        for (var i = 0; i < allGames.length; i++) {
+          if (String(allGames[i].id) === String(lastPlay)) { found = allGames[i]; break; }
+        }
+        if (found) goPlay(found);
+      }
+      try {
+        if (localStorage.getItem("jm-modal-open") === "1") {
+          var btn = document.getElementById("settings-btn");
+          if (btn) btn.click();
+        }
+      } catch (e) {}
+      window.scrollTo(0, 0);
     })
     .catch(function () {
       const root = document.getElementById("rows");
@@ -2996,7 +3023,10 @@ function init() {
           '<div class="no-results">could not load games.json, use npm start (not file://)</div>';
       }
     })
-    .finally(hideAppLoader);
+    .finally(function () {
+      hideAppLoader();
+      window.scrollTo(0, 0);
+    });
 }
 
 if (document.readyState === "loading") {
