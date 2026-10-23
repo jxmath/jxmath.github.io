@@ -3,7 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>jaxsons math</title>
+  <title>jxmath</title>
+  <meta name="description" content="free browser games you can play at school. no downloads, no sign up. arcade, io, puzzle, racing, shooter, platformer and 2 player games.">
+  <meta name="keywords" content="jxmath, jaxsons math, school games, free games, browser games, html5 games, games for school, chromebook games, 2 player games, io games, flash games">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta name="theme-color" content="#0b1020">
+  <link rel="canonical" href="https://jxmath.shop/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="jxmath">
+  <meta property="og:url" content="https://jxmath.shop/">
+  <meta property="og:title" content="jxmath">
+  <meta property="og:description" content="free browser games you can play at school. no downloads, no sign up. arcade, io, puzzle, racing, shooter, platformer and 2 player games.">
+  <meta property="og:image" content="https://jxmath.shop/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="jxmath">
+  <meta name="twitter:description" content="free browser games you can play at school. no downloads, no sign up. arcade, io, puzzle, racing, shooter, platformer and 2 player games.">
+  <meta name="twitter:image" content="https://jxmath.shop/og-image.png">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebSite","name":"jxmath","alternateName":"jaxsons math","url":"https://jxmath.shop/","potentialAction":{"@type":"SearchAction","target":"https://jxmath.shop/?q={search_term_string}","query-input":"required name=search_term_string"}}
+  </script>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="dns-prefetch" href="https://api.github.com">
   <script>try{var t=localStorage.getItem("jm-theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}try{if("scrollRestoration"in history)history.scrollRestoration="manual"}catch(e){}</script>
@@ -1596,6 +1614,7 @@ body::before {
       </div>
     </div>
 
+    <noscript><p>jxmath is a free game site. turn on javascript to play.</p></noscript>
     <main id="rows"></main>
 
     <div class="ad-wrap">
@@ -1975,7 +1994,7 @@ if (document.readyState === "loading") {
       preset = cookie("tabCloakPreset");
     }
     if (!preset || !PRESETS[preset]) {
-      document.title = "jaxsons math";
+      document.title = "jxmath";
       var links = document.querySelectorAll("link[rel*='icon']");
       for (var i = 0; i < links.length; i++) {
         links[i].parentNode.removeChild(links[i]);
@@ -2969,6 +2988,7 @@ function init() {
   }
   const search = document.getElementById("search-input");
   if (search) {
+    try { var qp = new URLSearchParams(location.search).get("q"); if (qp) currentQuery = qp.trim().toLowerCase(); } catch (e) {}
     if (currentQuery) search.value = currentQuery;
     search.addEventListener("input", function (e) {
       currentQuery = e.target.value.trim().toLowerCase();
