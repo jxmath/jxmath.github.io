@@ -1,7 +1,7 @@
 var CDN = "https://cdn.jsdelivr.net/gh/jxmath/assets@";
 var SCOPE = new URL("./", self.registration.scope).pathname;
 var PFX = SCOPE + "_g/";
-var CACHE = "jm-games-v4";
+var CACHE = "jm-games-v1";
 var CACHE_MAX = 64 * 1024 * 1024;
 
 var TYPES = {
@@ -16,52 +16,10 @@ var TYPES = {
   map: "application/json"
 };
 
-var HOSTS = [
-  function (sha, p) { return "https://cdn.jsdelivr.net/gh/jxmath/assets@" + sha + "/" + p; },
-  function (sha, p) { return "https://fastly.jsdelivr.net/gh/jxmath/assets@" + sha + "/" + p; },
-  function (sha, p) { return "https://raw.githubusercontent.com/jxmath/assets/" + sha + "/" + p; },
-  function (sha, p) { return "https://cdn.jsdelivr.net/gh/jxmath/assets@main/" + p; },
-  function (sha, p) { return "https://gcore.jsdelivr.net/gh/jxmath/assets@" + sha + "/" + p; }
-];
 var partsCache = {};
 
-function attempt(make, sha, path, opts) {
-  var ctl = new AbortController();
-  var timer = setTimeout(function () { ctl.abort(); }, 12000);
-  var o = {};
-  for (var k in opts) o[k] = opts[k];
-  o.signal = ctl.signal;
-  return fetch(make(sha, path), o).then(function (r) {
-    if (r.ok || r.status === 206) { clearTimeout(timer); return r; }
-    clearTimeout(timer);
-    throw new Error("s" + r.status);
-  }, function (e) { clearTimeout(timer); throw e; });
-}
-
-function cfetch(sha, path, opts) {
-  opts = opts || {};
-  return new Promise(function (resolve, reject) {
-    var launched = 0, failed = 0, done = false, errs = [], timer = null;
-    function launch() {
-      if (done || launched >= HOSTS.length) return;
-      var make = HOSTS[launched++];
-      attempt(make, sha, path, opts).then(function (r) {
-        if (done) return;
-        done = true; clearTimeout(timer);
-        resolve(r);
-      }, function (e) {
-        errs.push(e);
-        failed++;
-        if (done) return;
-        if (failed >= HOSTS.length) { done = true; clearTimeout(timer); reject(errs[0]); return; }
-        launch();
-      });
-      clearTimeout(timer);
-      if (launched < HOSTS.length) timer = setTimeout(launch, 2500);
-    }
-    launch();
-  });
-}
+self.addEventListener("install", function () { self.skipWaiting(); });
+self.addEventListener("activate", function (e) { e.waitUntil(self.clients.claim()); });
 
 function typeFor(path, fallback) {
   var m = /\.([a-z0-9]+)$/i.exec(path.split("?")[0]);
@@ -72,15 +30,15 @@ function typeFor(path, fallback) {
 
 function getParts(sha) {
   if (!partsCache[sha]) {
-    partsCache[sha] = cfetch(sha, "parts.json")
-      .then(function (r) { return r.json(); })
-      .catch(function () { delete partsCache[sha]; return {}; });
+    partsCache[sha] = fetch(CDN + sha + "/parts.json")
+      .then(function (r) { return r.ok ? r.json() : {}; })
+      .catch(function () { return {}; });
   }
   return partsCache[sha];
 }
 
 function syncShim(sha) {
-  return "<script>(function(){try{navigator.serviceWorker.register=function(){return Promise.reject(new Error(\"blocked\"))}}catch(e){}try{var N=function(k){var m=/^https?:\\/\\/[^\\/]+\\/_g\\/[^\\/]+\\/([^?#:]*)(?:[?#][^:]*)?:(.*)$/.exec(String(k));return m?'jm:'+m[1]+':'+m[2]:String(k)},S=Storage.prototype,g=S.getItem,t=S.setItem,r=S.removeItem;S.getItem=function(k){var n=N(k),v=g.call(this,n);return v===null&&n!==k?g.call(this,k):v};S.setItem=function(k,v){return t.call(this,N(k),v)};S.removeItem=function(k){return r.call(this,N(k))}}catch(e){}var o=XMLHttpRequest.prototype.open,p=" + JSON.stringify(PFX + sha + "/") + ",c=" + JSON.stringify(CDN + sha + "/") +
+  return "<script>(function(){var o=XMLHttpRequest.prototype.open,p=" + JSON.stringify(PFX + sha + "/") + ",c=" + JSON.stringify(CDN + sha + "/") +
     ";XMLHttpRequest.prototype.open=function(m,u,a){if(a===false&&typeof u===\"string\"){try{var x=new URL(u,document.baseURI);if(x.origin===location.origin&&x.pathname.indexOf(p)===0){arguments[1]=c+x.pathname.slice(p.length)+x.search}}catch(e){}}return o.apply(this,arguments)}})();<\/script>";
 }
 
@@ -130,7 +88,8 @@ function assemble(sha, path, info, req) {
         if (idx >= jobs.length) { ctrl.close(); return; }
         var j = jobs[idx++];
         var dir = path.slice(0, path.lastIndexOf("/") + 1);
-        return cfetch(sha, encodeURI(dir + j.name)).then(function (r) {
+        var url = CDN + sha + "/" + encodeURI(dir + j.name);
+        return fetch(url).then(function (r) {
           if (!r.ok) throw new Error("part " + r.status);
           if (j.whole) { reader = r.body.getReader(); return next(); }
           return r.arrayBuffer().then(function (b) {
@@ -156,10 +115,11 @@ function serve(req, sha, path) {
   return getParts(sha).then(function (parts) {
     var info = parts[path];
     if (info) return assemble(sha, path, info, req);
+    var url = CDN + sha + "/" + encodeURI(path);
     var hdr = {};
     var rg = req.headers.get("range");
     if (rg) hdr.range = rg;
-    return cfetch(sha, encodeURI(path), { headers: hdr }).then(function (r) {
+    return fetch(url, { headers: hdr }).then(function (r) {
       if (!r.ok && r.status !== 206) return r;
       var ct = typeFor(path, r.headers.get("content-type"));
       if (/\.html?$/i.test(path) && r.status === 200) {
