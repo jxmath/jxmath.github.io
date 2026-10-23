@@ -2,7 +2,7 @@
 
 just a game site i made for school
 
-the whole site is one file (`index.html`). games, thumbnails and the game list live in
+the site is one page (`index.html`); images live in `assets/`. games, thumbnails and the game list live in
 [jxmath/assets](https://github.com/jxmath/assets) and are loaded through jsDelivr.
 
 to change where assets load from, edit `JM_ASSETS` near the top of the first `<script>` in `index.html`.
