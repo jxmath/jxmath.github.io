@@ -404,6 +404,21 @@ header {
   background: transparent;
 }
 
+.tiles,
+.view-title {
+  transition: opacity 0.12s ease;
+}
+
+#rows.swap-out .tiles,
+#rows.swap-out .view-title,
+#rows.swap-out .no-results {
+  opacity: 0;
+}
+
+.view-title {
+  animation: tile-in 0.3s ease-out both;
+}
+
 .no-results {
   text-align: center;
   color: var(--text);
@@ -2285,13 +2300,15 @@ nav.pills .cat-count:empty {
 }
 
 .tile-art {
+  will-change: transform;
+  backface-visibility: hidden;
   position: relative;
   aspect-ratio: 3.14 / 1;
   border-radius: 10.3px;
   border: 1px solid #415166;
   background: #232b37 center / cover no-repeat;
   overflow: hidden;
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  transition: transform 0.22s ease-out, border-color 0.22s ease-out;
 }
 
 .tile:hover,
@@ -4349,11 +4366,23 @@ function setCategory(cat, btn) {
   saveViewState();
   document.body.classList.remove("side-open");
   var pv = document.getElementById("view-play");
-  jmVT(function () {
-    if (pv && !pv.hidden) goHomeNow();
+  var rows = document.getElementById("rows");
+  var playing = !!(pv && !pv.hidden);
+  if (playing) {
+    jmVT(function () {
+      goHomeNow();
+      render();
+      window.scrollTo(0, 0);
+    });
+    return;
+  }
+  if (rows) rows.classList.add("swap-out");
+  clearTimeout(window.__jmSwap);
+  window.__jmSwap = setTimeout(function () {
     render();
     window.scrollTo(0, 0);
-  });
+    if (rows) rows.classList.remove("swap-out");
+  }, rows ? 120 : 0);
 }
 
 
