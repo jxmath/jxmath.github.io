@@ -7,7 +7,7 @@
   <meta name="description" content="free browser games you can play at school. no downloads, no sign up. arcade, io, puzzle, racing, shooter, platformer and 2 player games.">
   <meta name="keywords" content="jxmath, jaxsons math, school games, free games, browser games, html5 games, games for school, chromebook games, 2 player games, io games, flash games">
   <meta name="robots" content="index, follow, max-image-preview:large">
-  <meta name="theme-color" content="#171a30">
+  <meta name="theme-color" content="#99cafc">
   <link rel="canonical" href="https://jxmath.shop/">
   <link rel="icon" type="image/png" href="/assets/favicon.png">
   <link rel="apple-touch-icon" href="/assets/favicon.png">
@@ -3055,7 +3055,6 @@ nav.pills .cat-count:empty {
       </div>
       <div class="play-bar">
         <div class="play-left">
-        <button type="button" class="play-close" id="play-close" aria-label="close game" title="close (esc)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
         <div class="play-bar-meta">
           <span id="play-title" class="play-title">loading</span>
           <span id="play-cat" class="play-cat"></span>
@@ -3070,6 +3069,7 @@ nav.pills .cat-count:empty {
           </div>
           <button class="play-action" id="btn-full" type="button">fullscreen</button>
           <button class="play-action" id="btn-blank" type="button">open in about:blank</button>
+          <button type="button" class="play-close" id="play-close" aria-label="close game" title="close (esc)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
         </div>
       </div>
     </div>
@@ -4311,26 +4311,9 @@ function jmPageTitle() {
   return jmCatLabel(c) + " games";
 }
 
-function jmHomeOrder() {
-  var playable = allGames.filter(function (g) { return !inCategory(g, "apps"); });
-  var apps = allGames.filter(function (g) { return inCategory(g, "apps"); });
-  var seen = {}, out = [];
-  function add(g) {
-    var k = String(g.id);
-    if (seen[k]) return;
-    seen[k] = 1;
-    out.push(g);
-  }
-  playable.forEach(function (g) { if (g.id === "rowdycitywrestling") add(g); });
-  topPopular(playable, 60).forEach(add);
-  playable.forEach(add);
-  apps.forEach(add);
-  return out;
-}
-
 function renderInner(root) {
   var home = currentCategory === "all" && !currentQuery;
-  var list = home ? jmHomeOrder() : groupRelated(allGames.filter(matches));
+  var list = home ? allGames.slice() : allGames.filter(matches);
   var title = jmPageTitle();
   if (title) {
     var h = document.createElement("h2");
